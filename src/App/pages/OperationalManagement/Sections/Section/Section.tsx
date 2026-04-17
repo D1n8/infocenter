@@ -11,7 +11,7 @@ function Section({title, children, onClick}: SectionType) {
     return ( 
         <section className={styles.section}>
             <div className={styles.topContainer}>
-                <p>{title}</p>
+                <h2 className={styles.title}>{title}</h2>
                 <Button onClick={onClick} children={'Загрузить данные'}/>
             </div>
             {children}
