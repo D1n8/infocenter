@@ -16,5 +16,6 @@
 
 .navItem:hover {
     color: var(--main-text);
-    border-bottom: 1px solid #2382C5;
+    border-bottom: 2px solid #2382C5;
+    cursor: pointer;
 }
