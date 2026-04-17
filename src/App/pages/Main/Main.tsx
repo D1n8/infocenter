@@ -1,6 +1,10 @@
+import Navigation from "../../components/Navigation";
+
 function Main() {
     return ( 
-        <div>main</div>
+        <div>
+            <Navigation/>
+        </div>
      );
 }
 

@@ -4,9 +4,17 @@
     box-sizing: border-box;
 }
 
+body{
+    font-family: 'Inter', sans-serif;
+}
+
 :root {
     --main-blue: #2382C5;
     --main-white: #fff;
     --main-text: #262626;
     --secondary: #525252;
+}
+
+ul{
+    list-style-type: none;
 }
