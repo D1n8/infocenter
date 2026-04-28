@@ -1,8 +1,10 @@
-import { Navigate, type RouteObject } from "react-router";
-import App from "../App";
-import AuthPage from "../App/pages/Auth";
-import { routes } from './routes'
-import Main from "../App/pages/Main";
+import { Navigate, type RouteObject } from 'react-router';
+
+import App from '../App';
+import AuthPage from '../App/pages/Auth';
+import Main from '../App/pages/Main';
+
+import { routes } from './routes';
 
 export const routesConfig: RouteObject[] = [
   {
@@ -11,16 +13,16 @@ export const routesConfig: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Main/>
+        element: <Main />,
       },
       {
         path: routes.auth.mask,
-        element: <AuthPage />
+        element: <AuthPage />,
       },
       {
-        path: "*",
+        path: '*',
         element: <Navigate to={routes.main.mask} replace />,
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];

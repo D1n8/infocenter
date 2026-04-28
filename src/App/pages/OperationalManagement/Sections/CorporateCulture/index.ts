@@ -1,1 +1,1 @@
-export { default } from './CorporateCulture'
+export { default } from './CorporateCulture';

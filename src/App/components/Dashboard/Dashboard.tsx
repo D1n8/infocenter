@@ -1,16 +1,16 @@
+import ReactECharts from 'echarts-for-react';
 import React, { useState, useMemo } from 'react';
 import { type RenderEditCellProps, DataGrid } from 'react-data-grid';
-import ReactECharts from 'echarts-for-react';
 import 'react-data-grid/lib/styles.css';
 import './Dashboard.scss';
 
 type RowData = Record<string, any>;
 
-interface ChartConfig {
+type ChartConfig = {
   xAxis: string;
   yAxis: string;
   chartType: 'bar' | 'pie';
-}
+};
 
 function CustomTextEditor({ row, column, onRowChange }: RenderEditCellProps<RowData>) {
   return (
@@ -32,12 +32,26 @@ function EditableHeaderCell(props: any) {
       <input
         value={column.name}
         onChange={(e) => onNameChange(column.key, e.target.value)}
-        style={{ flexGrow: 1, minWidth: 0, padding: '2px', fontSize: '14px', border: '1px solid transparent', borderRadius: '4px', backgroundColor: 'transparent'}}
+        style={{
+          flexGrow: 1,
+          minWidth: 0,
+          padding: '2px',
+          fontSize: '14px',
+          border: '1px solid transparent',
+          borderRadius: '4px',
+          backgroundColor: 'transparent',
+        }}
         title="Редактировать название"
       />
-      <button 
+      <button
         onClick={() => onRemoveColumn(column.key)}
-        style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#ff4d4f', fontWeight: 'bold' }}
+        style={{
+          cursor: 'pointer',
+          background: 'none',
+          border: 'none',
+          color: '#ff4d4f',
+          fontWeight: 'bold',
+        }}
         title="Удалить колонку"
       >
         ✕
@@ -51,27 +65,38 @@ function DeleteRowCell(props: any) {
   const { onRemoveRow } = column as any;
 
   return (
-    <button 
+    <button
       onClick={() => onRemoveRow(rowIdx)}
-    style={{ cursor: 'pointer', background: '#ff4d4f', color: 'white', border: 'none', borderRadius: '4px', padding: '4px', width: '24px' }}
+      style={{
+        cursor: 'pointer',
+        background: '#ff4d4f',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '4px',
+        width: '24px',
+      }}
     >
-        х
+      ✕
     </button>
   );
 }
 
 function transformDataForECharts(data: RowData[], config: ChartConfig) {
-  if (!config.xAxis || !config.yAxis) return {}; 
+  if (!config.xAxis || !config.yAxis) return {};
 
-  const groupedData = data.reduce((acc, row) => {
-    const xValue = String(row[config.xAxis] || 'Неизвестно'); 
-    const yValue = Number(row[config.yAxis]);
+  const groupedData = data.reduce(
+    (acc, row) => {
+      const xValue = String(row[config.xAxis] || 'Неизвестно');
+      const yValue = Number(row[config.yAxis]);
 
-    if (!acc[xValue]) acc[xValue] = 0;
-    if (!isNaN(yValue)) acc[xValue] += yValue;
+      if (!acc[xValue]) acc[xValue] = 0;
+      if (!isNaN(yValue)) acc[xValue] += yValue;
 
-    return acc;
-  }, {} as Record<string, number>);
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const categories = Object.keys(groupedData);
   const values = Object.values(groupedData);
@@ -81,18 +106,18 @@ function transformDataForECharts(data: RowData[], config: ChartConfig) {
       tooltip: { trigger: 'axis' },
       xAxis: { type: 'category', data: categories },
       yAxis: { type: 'value' },
-      series: [{ type: 'bar', data: values, itemStyle: { color: '#5470c6' } }]
+      series: [{ type: 'bar', data: values, itemStyle: { color: '#5470c6' } }],
     };
   }
 
   if (config.chartType === 'pie') {
-    const pieData = categories.map(cat => ({
+    const pieData = categories.map((cat) => ({
       name: cat,
-      value: groupedData[cat]
+      value: groupedData[cat],
     }));
     return {
       tooltip: { trigger: 'item' },
-      series: [{ type: 'pie', radius: '50%', data: pieData }]
+      series: [{ type: 'pie', radius: '50%', data: pieData }],
     };
   }
 
@@ -113,18 +138,69 @@ export default function DashboardExample() {
   ]);
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
-    xAxis: 'col1', 
+    xAxis: 'col1',
     yAxis: 'col3',
-    chartType: 'bar'
+    chartType: 'bar',
   });
 
+  // ==========================================
+  // ЛОГИКА ВСТАВКИ ИЗ EXCEL (Ctrl+V)
+  // ==========================================
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const clipboardData = e.clipboardData.getData('Text');
+    if (!clipboardData) return;
+
+    // Предотвращаем стандартное поведение браузера
+    e.preventDefault();
+
+    // Парсим TSV (Tab-Separated Values) из буфера обмена
+    const rawRows = clipboardData.split('\n');
+    const matrix = rawRows
+      .map((row) => row.split('\t'))
+      .filter((row) => row.some((cell) => cell.trim() !== '')); // Убираем пустые строки
+
+    if (matrix.length === 0) return;
+
+    // Предполагаем, что первая строка - это заголовки колонок
+    const headers = matrix[0];
+    const dataRows = matrix.slice(1);
+
+    // Генерируем новые колонки на основе заголовков
+    const newColumns = headers.map((headerText, index) => ({
+      key: `col_${Date.now()}_${index}`, // Уникальный ключ
+      name: headerText.trim() || `Колонка ${index + 1}`,
+      renderEditCell: CustomTextEditor,
+    }));
+
+    // Генерируем новые строки данных
+    const newRows = dataRows.map((rowArray) => {
+      const rowObject: RowData = {};
+      headers.forEach((_, colIndex) => {
+        const cellValue = rowArray[colIndex] || '';
+        rowObject[newColumns[colIndex].key] = cellValue.trim();
+      });
+      return rowObject;
+    });
+
+    // Обновляем состояние таблицы полностью новыми данными
+    setColumns(newColumns);
+    setRows(newRows);
+
+    // Важно: сбрасываем настройки осей, так как старые ключи колонок больше не существуют
+    setChartConfig((prev) => ({
+      ...prev,
+      xAxis: '',
+      yAxis: '',
+    }));
+  };
+
   const updateColumnName = (key: string, newName: string) => {
-    setColumns(prev => prev.map(c => c.key === key ? { ...c, name: newName } : c));
+    setColumns((prev) => prev.map((c) => (c.key === key ? { ...c, name: newName } : c)));
   };
 
   const removeColumn = (key: string) => {
-    setColumns(prev => prev.filter(c => c.key !== key));
-    setChartConfig(prev => ({
+    setColumns((prev) => prev.filter((c) => c.key !== key));
+    setChartConfig((prev) => ({
       ...prev,
       xAxis: prev.xAxis === key ? '' : prev.xAxis,
       yAxis: prev.yAxis === key ? '' : prev.yAxis,
@@ -133,38 +209,40 @@ export default function DashboardExample() {
 
   const addColumn = () => {
     const newKey = `col_${Date.now()}`;
-    setColumns(prev => [
-      ...prev, 
-      { key: newKey, name: 'Новая колонка', renderEditCell: CustomTextEditor }
+    setColumns((prev) => [
+      ...prev,
+      { key: newKey, name: 'Новая', renderEditCell: CustomTextEditor },
     ]);
-    setRows(prev => prev.map(r => ({ ...r, [newKey]: '' })));
+    setRows((prev) => prev.map((r) => ({ ...r, [newKey]: '' })));
   };
 
   const removeRow = (rowIdx: number) => {
-    setRows(prev => prev.filter((_, idx) => idx !== rowIdx));
+    setRows((prev) => prev.filter((_, idx) => idx !== rowIdx));
   };
 
   const addRow = () => {
     const newRow: RowData = {};
-    columns.forEach(col => { newRow[col.key] = ''; });
-    setRows(prev => [...prev, newRow]);
+    columns.forEach((col) => {
+      newRow[col.key] = '';
+    });
+    setRows((prev) => [...prev, newRow]);
   };
 
   const gridColumns = [
-    ...columns.map(col => ({
+    ...columns.map((col) => ({
       ...col,
       renderHeaderCell: EditableHeaderCell,
       onNameChange: updateColumnName,
-      onRemoveColumn: removeColumn
+      onRemoveColumn: removeColumn,
     })),
     {
       key: 'actions',
-      name: "",
+      name: '',
       width: 50,
       editable: false,
       renderCell: DeleteRowCell,
-      onRemoveRow: removeRow
-    }
+      onRemoveRow: removeRow,
+    },
   ];
 
   const chartOption = useMemo(() => {
@@ -173,39 +251,53 @@ export default function DashboardExample() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', padding: '15px', background: '#f5f5f5', borderRadius: '8px' }}>
+      <div
+        style={{
+          marginBottom: '20px',
+          display: 'flex',
+          gap: '15px',
+          padding: '15px',
+          background: '#f5f5f5',
+          borderRadius: '8px',
+        }}
+      >
         <label>
           <b>Ось X (Категории): </b>
-          <select 
-            value={chartConfig.xAxis} 
-            onChange={(e) => setChartConfig({...chartConfig, xAxis: e.target.value})}
+          <select
+            value={chartConfig.xAxis}
+            onChange={(e) => setChartConfig({ ...chartConfig, xAxis: e.target.value })}
           >
             <option value="">-- Выберите колонку --</option>
-            {columns.map(col => (
-              <option key={col.key} value={col.key}>{col.name}</option>
+            {columns.map((col) => (
+              <option key={col.key} value={col.key}>
+                {col.name}
+              </option>
             ))}
           </select>
         </label>
 
         <label>
           <b>Ось Y (Значения): </b>
-          <select 
-            value={chartConfig.yAxis} 
-            onChange={(e) => setChartConfig({...chartConfig, yAxis: e.target.value})}
+          <select
+            value={chartConfig.yAxis}
+            onChange={(e) => setChartConfig({ ...chartConfig, yAxis: e.target.value })}
           >
             <option value="">-- Выберите колонку --</option>
-            {columns.map(col => (
-              <option key={col.key} value={col.key}>{col.name}</option>
+            {columns.map((col) => (
+              <option key={col.key} value={col.key}>
+                {col.name}
+              </option>
             ))}
           </select>
         </label>
 
         <label>
           <b>Тип графика: </b>
-          <select 
-            value={chartConfig.chartType} 
-            onChange={(e) => setChartConfig({...chartConfig, chartType: e.target.value as 'bar' | 'pie'})}
+          <select
+            value={chartConfig.chartType}
+            onChange={(e) =>
+              setChartConfig({ ...chartConfig, chartType: e.target.value as 'bar' | 'pie' })
+            }
           >
             <option value="bar">Гистограмма (Bar)</option>
             <option value="pie">Круговая (Pie)</option>
@@ -213,14 +305,31 @@ export default function DashboardExample() {
         </label>
       </div>
 
-      <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
-        <button onClick={addRow} style={{ padding: '8px 12px', cursor: 'pointer' }}>+ Добавить строку</button>
-        <button onClick={addColumn} style={{ padding: '8px 12px', cursor: 'pointer' }}>+ Добавить колонку</button>
+      <div
+        style={{
+          marginBottom: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={addRow} style={{ padding: '8px 12px', cursor: 'pointer' }}>
+            + Добавить строку
+          </button>
+          <button onClick={addColumn} style={{ padding: '8px 12px', cursor: 'pointer' }}>
+            + Добавить колонку
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: '20px' }}>
-        
-        <div style={{ width: '50%' }}>
+        {/* ОБЕРТКА ДЛЯ ПЕРЕХВАТА ВСТАВКИ */}
+        <div
+          style={{ width: '50%', outline: 'none' }}
+          onPaste={handlePaste}
+          tabIndex={0} // Позволяет div'у получать фокус для события onPaste
+        >
           <DataGrid
             columns={gridColumns}
             rows={rows}
@@ -231,14 +340,15 @@ export default function DashboardExample() {
 
         <div style={{ width: '50%', border: '1px solid #ddd', borderRadius: '8px' }}>
           {chartConfig.xAxis && chartConfig.yAxis ? (
-             <ReactECharts option={chartOption} style={{ height: '400px' }} />
+            <ReactECharts option={chartOption} style={{ height: '400px' }} />
           ) : (
-             <div style={{ padding: '20px', textAlign: 'center', color: '#888', marginTop: '100px' }}>
-               Выберите оси X и Y для построения графика
-             </div>
+            <div
+              style={{ padding: '20px', textAlign: 'center', color: '#888', marginTop: '100px' }}
+            >
+              Выберите оси X и Y для построения графика
+            </div>
           )}
         </div>
-
       </div>
     </div>
   );

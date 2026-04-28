@@ -1,1 +1,1 @@
-export { default } from './Quality'
+export { default } from './Quality';

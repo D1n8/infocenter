@@ -1,10 +1,7 @@
-import Section from "../Section";
+import Section from '../Section';
 
 function Economy() {
-    return (
-        <Section title="Экономика">
-        </Section>
-    );
+  return <Section title="Экономика" />;
 }
 
 export default Economy;

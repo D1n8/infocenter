@@ -1,10 +1,7 @@
-import Section from "../Section";
+import Section from '../Section';
 
 function Quality() {
-    return (
-        <Section title="Качество">
-        </Section>
-    );
+  return <Section title="Качество" />;
 }
 
 export default Quality;
