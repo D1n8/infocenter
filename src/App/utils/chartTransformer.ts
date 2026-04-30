@@ -3,18 +3,18 @@ import type { RowData, ChartConfig } from 'types/index';
 export function transformDataForECharts(data: RowData[], config: ChartConfig) {
   if (!config.xAxis || !config.yAxis) return {};
 
-  const groupedData = data.reduce(
-    (acc, row) => {
-      const xValue = String(row[config.xAxis] || 'Неизвестно');
-      const yValue = Number(row[config.yAxis]);
+  const groupedData = data.reduce<Record<string, number>>((acc, row) => {
+    const xValue = String(row[config.xAxis] || 'Неизвестно');
+    const yValue = Number(row[config.yAxis]);
 
-      if (!acc[xValue]) acc[xValue] = 0;
-      if (!isNaN(yValue)) acc[xValue] += yValue;
+    if (!isNaN(yValue)) {
+      const currentSum = acc[xValue] ?? 0;
 
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+      acc[xValue] = currentSum + yValue;
+    }
+
+    return acc;
+  }, {});
 
   const categories = Object.keys(groupedData);
   const values = Object.values(groupedData);
