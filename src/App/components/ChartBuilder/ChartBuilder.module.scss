@@ -1,0 +1,31 @@
+.widget {
+}
+
+.btnsContainer {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.dataGridContainer {
+  width: 50%;
+}
+
+.widgetContent {
+  display: flex;
+  gap: 20px;
+}
+
+.chartContainer {
+  width: 50%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.chartInfo {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary);
+}
