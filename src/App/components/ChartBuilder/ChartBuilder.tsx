@@ -1,3 +1,4 @@
+import Button from 'components/Button';
 import ReactECharts from 'echarts-for-react';
 import React, { useState, useMemo } from 'react';
 import { DataGrid } from 'react-data-grid';
@@ -5,12 +6,13 @@ import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index
 import { transformDataForECharts } from 'utils/chartTransformer';
 import { parseClipboardData } from 'utils/clipboard';
 
-import { CustomTextEditor } from '../Grid/CustomTextEditor';
-import { DeleteRowCell } from '../Grid/DeleteRowCell';
-import { EditableHeaderCell } from '../Grid/EditableHeaderCell';
+import CustomTextEditor from '../Grid/CustomTextEditor';
+import DeleteRowCell from '../Grid/DeleteRowCell';
+import EditableHeaderCell from '../Grid/EditableHeaderCell';
 
 import 'react-data-grid/lib/styles.css';
-import './ChartBuilder.scss';
+import styles from './ChartBuilder.module.scss';
+import ChartConfigMenu from './components/ChartConfigMenu';
 
 type ChartBuilderProps = {
   initialColumns?: BaseColumn[];
@@ -100,72 +102,19 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
   }, [rows, chartConfig]);
 
   return (
-    <div>
-      <div
-        style={{
-          marginBottom: '20px',
-          display: 'flex',
-          gap: '15px',
-          padding: '15px',
-          background: '#f5f5f5',
-          borderRadius: '8px',
-        }}
-      >
-        <label>
-          <b>Ось X: </b>
-          <select
-            value={chartConfig.xAxis}
-            onChange={(e) => setChartConfig({ ...chartConfig, xAxis: e.target.value })}
-          >
-            <option value="">-- Выберите колонку --</option>
-            {columns.map((col) => (
-              <option key={col.key} value={col.key}>
-                {col.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          <b>Ось Y: </b>
-          <select
-            value={chartConfig.yAxis}
-            onChange={(e) => setChartConfig({ ...chartConfig, yAxis: e.target.value })}
-          >
-            <option value="">-- Выберите колонку --</option>
-            {columns.map((col) => (
-              <option key={col.key} value={col.key}>
-                {col.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          <b>Тип графика: </b>
-          <select
-            value={chartConfig.chartType}
-            onChange={(e) =>
-              setChartConfig({ ...chartConfig, chartType: e.target.value as 'bar' | 'pie' })
-            }
-          >
-            <option value="bar">Гистограмма (Bar)</option>
-            <option value="pie">Круговая (Pie)</option>
-          </select>
-        </label>
+    <div className={styles.widget}>
+      <ChartConfigMenu
+        columns={columns}
+        chartConfig={chartConfig}
+        setChartConfig={setChartConfig}
+      />
+      <div className={styles.btnsContainer}>
+        <Button onClick={addRow}>+ Добавить строку</Button>
+        <Button onClick={addColumn}>+ Добавить колонку</Button>
       </div>
 
-      <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
-        <button onClick={addRow} style={{ padding: '8px 12px', cursor: 'pointer' }}>
-          + Добавить строку
-        </button>
-        <button onClick={addColumn} style={{ padding: '8px 12px', cursor: 'pointer' }}>
-          + Добавить колонку
-        </button>
-      </div>
-
-      <div style={{ display: 'flex', gap: '20px' }}>
-        <div style={{ width: '50%', outline: 'none' }} onPaste={handlePaste} tabIndex={0}>
+      <div className={styles.widgetContent}>
+        <div className={styles.dataGridContainer} onPaste={handlePaste} tabIndex={0}>
           <DataGrid
             columns={gridColumns}
             rows={rows}
@@ -174,15 +123,11 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
           />
         </div>
 
-        <div style={{ width: '50%', border: '1px solid #ddd', borderRadius: '8px' }}>
+        <div className={styles.chartContainer}>
           {chartConfig.xAxis && chartConfig.yAxis ? (
-            <ReactECharts option={chartOption} style={{ height: '400px' }} />
+            <ReactECharts option={chartOption} style={{ height: '100%' }} />
           ) : (
-            <div
-              style={{ padding: '20px', textAlign: 'center', color: '#888', marginTop: '100px' }}
-            >
-              Выберите оси X и Y для построения графика
-            </div>
+            <p className={styles.chartInfo}>Выберите оси X и Y для построения графика</p>
           )}
         </div>
       </div>

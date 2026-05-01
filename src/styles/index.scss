@@ -1,21 +1,25 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    font-family: 'Inter', sans-serif;
+body {
+  font-family: 'Inter', sans-serif;
 }
 
 :root {
-    --rdg-color-scheme: light;
-    --main-blue: #2382C5;
-    --main-white: #fff;
-    --main-text: #262626;
-    --secondary: #525252;
+  --rdg-color-scheme: light;
+  --main-blue: #2382c5;
+  --main-white: #fff;
+  --main-text: #262626;
+  --secondary: #525252;
 }
 
-ul{
-    list-style-type: none;
+ul {
+  list-style-type: none;
+}
+
+.rdg-cell {
+  padding-inline: 8px;
 }
