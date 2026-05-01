@@ -4,7 +4,7 @@ export const routes = {
     create: () => '/',
   },
   auth: {
-    mask: '/auth',
+    mask: 'auth',
     create: () => '/auth',
   },
 };
