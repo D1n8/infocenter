@@ -1,7 +1,12 @@
+import { useState } from 'react';
+
 import Section from '../Section';
 
 function CorporateCulture() {
-  return <Section title="Корпоративная культура" />;
+  const [isMaximize, setIsMaximize] = useState(true);
+  return (
+    <Section isMaximize={isMaximize} setIsMaximize={setIsMaximize} title="Корпоративная культура" />
+  );
 }
 
 export default CorporateCulture;
