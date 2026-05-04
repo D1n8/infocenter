@@ -24,6 +24,7 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
   const [rows, setRows] = useState<RowData[]>(initialRows);
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    title: { text: 'Chart Builder' },
     xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
     yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
     chartType: 'bar',
