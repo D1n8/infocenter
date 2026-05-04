@@ -21,6 +21,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig) {
 
   if (config.chartType === 'bar') {
     return {
+      title: { text: config.title.text, textStyle: { fontSize: 14, fontWeight: 400 } },
       tooltip: { trigger: 'axis' },
       xAxis: { type: 'category', data: categories },
       yAxis: { type: 'value' },
@@ -34,6 +35,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig) {
       value: groupedData[cat],
     }));
     return {
+      title: { text: config.title.text, textStyle: { fontSize: 14, fontWeight: 400 } },
       tooltip: { trigger: 'item' },
       series: [{ type: 'pie', radius: '50%', data: pieData }],
     };

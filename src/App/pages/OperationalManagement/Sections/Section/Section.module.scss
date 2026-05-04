@@ -1,16 +1,41 @@
-.section{
-
+.section {
 }
 
-.topContainer{
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.topContainer {
+  margin-bottom: 20px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.title{
-    font-size: 24px;
-    line-height: 1.66;
-    font-weight: normal;
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  font-size: 24px;
+  line-height: 1.66;
+  font-weight: normal;
+}
+
+.sizeBtn {
+  transition: all 0.2s ease-in-out;
+}
+
+.maxBtn:hover {
+  transform: scale(1.15);
+}
+
+.minBtn:hover {
+  transform: scale(0.85);
+}
+
+.sectionContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 20px;
+  column-gap: 25px;
 }
