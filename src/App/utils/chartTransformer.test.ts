@@ -11,13 +11,23 @@ describe('transformDataForECharts', () => {
   ];
 
   it('возвращает пустой объект, если оси не выбраны', () => {
-    const config: ChartConfig = { xAxis: '', yAxis: '', chartType: 'bar' };
+    const config: ChartConfig = {
+      title: { text: 'Mock chart' },
+      xAxis: '',
+      yAxis: '',
+      chartType: 'bar',
+    };
     const result = transformDataForECharts(mockData, config);
     expect(result).toEqual({});
   });
 
   it('корректно трансформируются данные для гистограммы', () => {
-    const config: ChartConfig = { xAxis: 'department', yAxis: 'salary', chartType: 'bar' };
+    const config: ChartConfig = {
+      title: { text: 'Mock chart' },
+      xAxis: 'department',
+      yAxis: 'salary',
+      chartType: 'bar',
+    };
     const result = transformDataForECharts(mockData, config);
 
     if (!result.series) {
@@ -29,7 +39,12 @@ describe('transformDataForECharts', () => {
   });
 
   it('корректно трансформируются данные для круговой диаграммы', () => {
-    const config: ChartConfig = { xAxis: 'department', yAxis: 'salary', chartType: 'pie' };
+    const config: ChartConfig = {
+      title: { text: 'Mock chart' },
+      xAxis: 'department',
+      yAxis: 'salary',
+      chartType: 'pie',
+    };
     const result = transformDataForECharts(mockData, config);
 
     if (!result.series) {
@@ -47,7 +62,12 @@ describe('transformDataForECharts', () => {
       { department: 'IT', salary: 2000 },
       { department: 'IT', salary: 'invalid_string' },
     ];
-    const config: ChartConfig = { xAxis: 'department', yAxis: 'salary', chartType: 'bar' };
+    const config: ChartConfig = {
+      title: { text: 'Mock chart' },
+      xAxis: 'department',
+      yAxis: 'salary',
+      chartType: 'bar',
+    };
     const result = transformDataForECharts(dataWithInvalid, config);
 
     if (!result.series) {
