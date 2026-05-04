@@ -3,6 +3,9 @@ import type { Column } from 'react-data-grid';
 export type RowData = Record<string, string | number>;
 
 export type ChartConfig = {
+  title: {
+    text: string;
+  };
   xAxis: string;
   yAxis: string;
   chartType: 'bar' | 'pie';

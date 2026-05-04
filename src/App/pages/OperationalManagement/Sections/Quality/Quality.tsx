@@ -1,7 +1,10 @@
+import { useState } from 'react';
+
 import Section from '../Section';
 
 function Quality() {
-  return <Section title="Качество" />;
+  const [isMaximize, setIsMaximize] = useState(true);
+  return <Section isMaximize={isMaximize} setIsMaximize={setIsMaximize} title="Качество" />;
 }
 
 export default Quality;
