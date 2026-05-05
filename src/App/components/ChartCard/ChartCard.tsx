@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { transformDataForECharts } from 'App/utils/chartTransformer';
+import classNames from 'classnames';
 import MoreVertButton from 'components/IconButtons/MoreVertButton';
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
@@ -12,9 +13,10 @@ type ChartCard = {
   data: RowData[];
   config: ChartConfig;
   id: number;
+  isHidden?: boolean;
 };
 
-function ChartCard({ data, config, id }: ChartCard) {
+function ChartCard({ data, config, id, isHidden = false }: ChartCard) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   const style = {
@@ -27,7 +29,11 @@ function ChartCard({ data, config, id }: ChartCard) {
   }, [data, config]);
 
   return (
-    <article ref={setNodeRef} style={style} className={styles.chartCard}>
+    <article
+      ref={setNodeRef}
+      style={style}
+      className={classNames(styles.chartCard, { [styles.hidden]: isHidden })}
+    >
       <MoreVertButton {...attributes} {...listeners} className={styles.moreVert} />
       <ReactECharts option={chartOption} />
     </article>

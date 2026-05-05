@@ -5,7 +5,7 @@ import 'react-data-grid/lib/styles.css';
 import { config, mockData } from '../mockData';
 
 function Production() {
-  const [isMaximize, setIsMaximize] = useState(true);
+  const [isMaximize, setIsMaximize] = useState(false);
 
   const [cards, setCards] = useState([
     { id: 1, data: mockData, config },
