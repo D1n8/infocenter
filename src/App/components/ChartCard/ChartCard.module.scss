@@ -3,6 +3,12 @@
   max-width: 600px;
   background-color: white;
   border-radius: 10px;
+
+  animation: slideDownFade 0.4s ease-out forwards;
+
+  &.hidden {
+    display: none;
+  }
 }
 
 .moreVert {
@@ -11,4 +17,15 @@
   right: 15px;
   cursor: grab;
   z-index: 1;
+}
+
+@keyframes slideDownFade {
+  0% {
+    opacity: 0;
+    translate: 0 -40px;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
 }

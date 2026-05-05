@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import Button from 'components/Button';
 import MaximizeButton from 'components/IconButtons/MaximizeButton';
 import MinimizeButton from 'components/IconButtons/MinimizeButton';
+import { useEffect, useState } from 'react';
 import type { ChartConfig, RowData } from 'types/index';
 
 import styles from './Section.module.scss';
@@ -34,6 +35,13 @@ type SectionType = {
 };
 
 function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }: SectionType) {
+  const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
+
+  useEffect(() => {
+    if (isMaximize && !hasRenderedAll) {
+      setHasRenderedAll(true);
+    }
+  }, [isMaximize, hasRenderedAll]);
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -49,20 +57,22 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
     }
   };
 
+  const renderedCards = hasRenderedAll ? cards : cards.slice(0, 3);
+
   return (
     <section className={styles.section}>
       <div className={styles.topContainer}>
         <div className={styles.titleContainer}>
           <h2 className={styles.title}>{title}</h2>
           {isMaximize ? (
-            <MaximizeButton
+            <MinimizeButton
               onClick={() => setIsMaximize(false)}
-              className={classNames(styles.sizeBtn, styles.maxBtn)}
+              className={classNames(styles.sizeBtn, styles.minBtn)}
             />
           ) : (
-            <MinimizeButton
+            <MaximizeButton
               onClick={() => setIsMaximize(true)}
-              className={classNames(styles.sizeBtn, styles.minBtn)}
+              className={classNames(styles.sizeBtn, styles.maxBtn)}
             />
           )}
         </div>
@@ -76,9 +86,19 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
       >
         <SortableContext items={cards.map((c) => c.id)} strategy={rectSortingStrategy}>
           <div className={styles.sectionContainer}>
-            {cards.map((card) => (
-              <ChartCard key={card.id} id={card.id} data={card.data} config={card.config} />
-            ))}
+            {renderedCards.map((card, index) => {
+              const isHidden = !isMaximize && index >= 3;
+
+              return (
+                <ChartCard
+                  key={card.id}
+                  id={card.id}
+                  data={card.data}
+                  config={card.config}
+                  isHidden={isHidden}
+                />
+              );
+            })}
           </div>
         </SortableContext>
       </DndContext>
