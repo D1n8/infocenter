@@ -2,6 +2,7 @@ import { Navigate, type RouteObject } from 'react-router';
 
 import App from '../App';
 import AuthPage from '../App/pages/Auth';
+import ChartListSettings from '../App/pages/ChartListSettings';
 import Main from '../App/pages/Main';
 
 import { routes } from './routes';
@@ -18,6 +19,10 @@ export const routesConfig: RouteObject[] = [
       {
         path: routes.auth.mask,
         element: <AuthPage />,
+      },
+      {
+        path: routes.chartListSettings.mask,
+        element: <ChartListSettings />,
       },
       {
         path: '*',

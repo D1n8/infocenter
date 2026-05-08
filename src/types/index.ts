@@ -21,3 +21,21 @@ export type CustomColumn = Column<RowData> & {
   onRemoveColumn?: (key: string) => void;
   onRemoveRow?: (rowIdx: number) => void;
 };
+
+export type CardType = {
+  id: number;
+  data: RowData[];
+  config: ChartConfig;
+};
+
+export type ChartListType = {
+  cards: CardType[];
+  setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+  isMaximize?: boolean;
+};
+
+export type SectionType = ChartListType & {
+  setIsMaximize: (flag: boolean) => void;
+  title?: string;
+  onClick?: () => void;
+};

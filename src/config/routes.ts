@@ -7,4 +7,8 @@ export const routes = {
     mask: 'auth',
     create: () => '/auth',
   },
+  chartListSettings: {
+    mask: 'chart-list-settings',
+    create: () => '/chart-list-settings',
+  },
 };

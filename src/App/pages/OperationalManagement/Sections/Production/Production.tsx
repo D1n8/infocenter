@@ -1,20 +1,16 @@
+import { routes } from 'config/routes';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import Section from '../Section';
 import 'react-data-grid/lib/styles.css';
-import { config, mockData } from '../mockData';
+import { mockCharts } from '../mockData';
 
 function Production() {
   const [isMaximize, setIsMaximize] = useState(false);
+  const navigate = useNavigate();
 
-  const [cards, setCards] = useState([
-    { id: 1, data: mockData, config },
-    { id: 2, data: mockData, config },
-    { id: 3, data: mockData, config },
-    { id: 4, data: mockData, config },
-    { id: 5, data: mockData, config },
-    { id: 6, data: mockData, config },
-  ]);
+  const [cards, setCards] = useState(mockCharts);
 
   return (
     <Section
@@ -23,6 +19,7 @@ function Production() {
       cards={cards}
       setCards={setCards}
       title="Производство"
+      onClick={() => navigate(routes.chartListSettings.mask)}
     />
   );
 }
