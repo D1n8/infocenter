@@ -11,4 +11,8 @@ export const routes = {
     mask: 'chart-list-settings',
     create: () => '/chart-list-settings',
   },
+  chartBuilder: {
+    mask: 'chart-builder',
+    create: () => '/chart-builder',
+  },
 };
