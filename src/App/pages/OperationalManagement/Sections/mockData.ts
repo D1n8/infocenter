@@ -11,3 +11,12 @@ export const config: ChartConfig = {
   yAxis: 'salary',
   chartType: 'bar',
 };
+
+export const mockCharts = [
+  { id: 1, data: mockData, config },
+  { id: 2, data: mockData, config },
+  { id: 3, data: mockData, config },
+  { id: 4, data: mockData, config },
+  { id: 5, data: mockData, config },
+  { id: 6, data: mockData, config },
+];
