@@ -18,6 +18,14 @@
   z-index: 1;
 }
 
+.moveBtn {
+  position: absolute;
+  top: 45%;
+  right: 15px;
+  cursor: grab;
+  z-index: 1;
+}
+
 @keyframes slideDownFade {
   0% {
     opacity: 0;

@@ -1,0 +1,20 @@
+.popupBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 15px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  span {
+    font-size: 16px;
+    font-family: 'Inter';
+    color: var(--main-text);
+  }
+}
+
+.popupBtn:not(:last-child) {
+  border-bottom: 1px solid #e5e5e5;
+}
