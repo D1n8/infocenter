@@ -1,2 +1,36 @@
-.chartListSettings {
+.topContainer {
+  margin-bottom: 20px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  font-size: 24px;
+  line-height: 1.66;
+  font-weight: normal;
+}
+
+.bottomContainer {
+  display: flex;
+  justify-content: end;
+}
+
+.btnContainer {
+  display: flex;
+  gap: 40px;
+  align-items: end;
+}
+
+.cancelBtn {
+  background-color: transparent;
+  color: var(--main-text);
+  border: 1px solid #e5e5e5;
 }

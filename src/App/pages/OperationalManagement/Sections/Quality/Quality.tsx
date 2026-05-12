@@ -4,7 +4,7 @@ import Section from '../Section';
 import { config, mockData } from '../mockData';
 
 function Quality() {
-  const [isMaximize, setIsMaximize] = useState(true);
+  const [isMaximize, setIsMaximize] = useState(false);
   const [cards, setCards] = useState([
     { id: 1, data: mockData, config },
     { id: 2, data: mockData, config },

@@ -33,8 +33,10 @@ function ChartCard({ data, config, id, isHidden = false }: ChartCard) {
       ref={setNodeRef}
       style={style}
       className={classNames(styles.chartCard, { [styles.hidden]: isHidden })}
+      {...attributes}
+      {...listeners}
     >
-      <MoreVertButton {...attributes} {...listeners} className={styles.moreVert} />
+      <MoreVertButton className={styles.moreVert} />
       <ReactECharts option={chartOption} />
     </article>
   );

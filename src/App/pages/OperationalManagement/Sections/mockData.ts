@@ -1,4 +1,4 @@
-import type { ChartConfig, RowData } from 'types/index';
+import type { CardType, ChartConfig, RowData } from 'types/index';
 
 export const mockData: RowData[] = [
   { department: 'IT', salary: 2000 },
@@ -12,7 +12,7 @@ export const config: ChartConfig = {
   chartType: 'bar',
 };
 
-export const mockCharts = [
+export const mockCharts: CardType[] = [
   { id: 1, data: mockData, config },
   { id: 2, data: mockData, config },
   { id: 3, data: mockData, config },
@@ -20,3 +20,26 @@ export const mockCharts = [
   { id: 5, data: mockData, config },
   { id: 6, data: mockData, config },
 ];
+
+export const sectionsData: Record<string, { title: string; charts: CardType[] }> = {
+  production: {
+    title: 'Производство',
+    charts: mockCharts,
+  },
+  culture: {
+    title: 'Корпоративная культура',
+    charts: mockCharts,
+  },
+  economy: {
+    title: 'Экономика',
+    charts: mockCharts,
+  },
+  quality: {
+    title: 'Качество',
+    charts: mockCharts,
+  },
+  safety: {
+    title: 'Безопасность',
+    charts: mockCharts,
+  },
+};

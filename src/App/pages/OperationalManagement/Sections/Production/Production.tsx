@@ -1,25 +1,25 @@
 import { routes } from 'config/routes';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import Section from '../Section';
 import 'react-data-grid/lib/styles.css';
-import { mockCharts } from '../mockData';
+import { sectionsData } from '../mockData';
 
 function Production() {
   const [isMaximize, setIsMaximize] = useState(false);
   const navigate = useNavigate();
 
-  const [cards, setCards] = useState(mockCharts);
+  const section = sectionsData['production'];
 
   return (
     <Section
       isMaximize={isMaximize}
       setIsMaximize={setIsMaximize}
-      cards={cards}
-      setCards={setCards}
-      title="Производство"
-      onClick={() => navigate(routes.chartListSettings.mask)}
+      cards={section.charts}
+      setCards={() => {}}
+      title={section.title}
+      onClick={() => navigate(routes.chartListSettings.create('production'))}
     />
   );
 }
