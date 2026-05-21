@@ -1,6 +1,8 @@
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { transformDataForECharts } from 'App/utils/chartTransformer';
-import classNames from 'classnames';
 import MoreVertButton from 'components/IconButtons/MoreVertButton';
+import MoveButton from 'components/IconButtons/MoveButton';
 import Delete from 'components/Icons/Delete';
 import Edit from 'components/Icons/Edit';
 import FullScreen from 'components/Icons/FullScreen';
@@ -10,18 +12,12 @@ import PopupMenu from 'components/PopupMenu';
 import PopupMenuBtn from 'components/PopupMenuBtn';
 import ReactECharts from 'echarts-for-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ChartConfig, RowData } from 'types/index';
 
+import type { ChartCardType } from './ChartCard';
 import styles from './ChartCard.module.scss';
 
-export type ChartCardType = {
-  data: RowData[];
-  config: ChartConfig;
-  id: number;
-  isHidden?: boolean;
-};
-
-function ChartCard({ data, config, isHidden = false }: ChartCardType) {
+function ChartCard({ data, config, id }: ChartCardType) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -42,12 +38,17 @@ function ChartCard({ data, config, isHidden = false }: ChartCardType) {
     };
   }, [menuIsOpen]);
 
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const chartOption = useMemo(() => {
     return transformDataForECharts(data, config);
   }, [data, config]);
 
   return (
-    <article className={classNames(styles.chartCard, { [styles.hidden]: isHidden })}>
+    <article ref={setNodeRef} style={style} className={styles.chartCard}>
       <div ref={menuRef}>
         <MoreVertButton
           className={styles.moreVert}
@@ -64,6 +65,9 @@ function ChartCard({ data, config, isHidden = false }: ChartCardType) {
           </PopupMenu>
         )}
       </div>
+
+      <MoveButton className={styles.moveBtn} {...attributes} {...listeners} />
+
       <ReactECharts option={chartOption} />
     </article>
   );

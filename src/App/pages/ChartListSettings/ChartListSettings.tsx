@@ -1,23 +1,40 @@
-import ChartList from 'App/components/ChartList';
+import ChartListDraggable from 'App/components/ChartList/ChartListDraggable';
 import Button from 'components/Button';
+import BackButton from 'components/IconButtons/BackButton';
 import { routes } from 'config/routes';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { mockCharts } from '../OperationalManagement/Sections/mockData';
+import { sectionsData } from '../OperationalManagement/Sections/mockData';
 
 import styles from './ChartListSettings.module.scss';
 
 function ChartListSettings() {
-  const [cards, setCards] = useState(mockCharts);
   const navigate = useNavigate();
+
+  const { sectionId } = useParams<{ sectionId: string }>();
+  const currentSection = sectionsData[sectionId ?? 'production'];
+
+  const [cards, setCards] = useState(currentSection.charts);
+
   return (
     <div className={styles.chartListSettings}>
-      <Button onClick={() => navigate(-1)}>Назад</Button>
-      <Button onClick={() => navigate(routes.chartBuilder.create())}>Добавить график</Button>
-      <ChartList cards={cards} setCards={setCards} />
-      <Button>Отменить</Button>
-      <Button>Сохранить</Button>
+      <div className={styles.topContainer}>
+        <div className={styles.titleContainer}>
+          <BackButton onClick={() => navigate(-1)}>Назад</BackButton>
+          <h2 className={styles.title}>{currentSection.title}</h2>
+        </div>
+        <Button onClick={() => navigate(routes.chartBuilder.create())}>Добавить график</Button>
+      </div>
+      <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
+      <div className={styles.bottomContainer}>
+        <div className={styles.btnContainer}>
+          <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
+            Отменить
+          </Button>
+          <Button>Сохранить</Button>
+        </div>
+      </div>
     </div>
   );
 }

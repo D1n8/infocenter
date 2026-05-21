@@ -8,8 +8,8 @@ export const routes = {
     create: () => '/auth',
   },
   chartListSettings: {
-    mask: 'chart-list-settings',
-    create: () => '/chart-list-settings',
+    mask: 'chart-list-settings/:sectionId',
+    create: (sectionId: string) => `/chart-list-settings/${sectionId}`,
   },
   chartBuilder: {
     mask: 'chart-builder',

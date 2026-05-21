@@ -4,7 +4,7 @@ import Section from '../Section';
 import { config, mockData } from '../mockData';
 
 function CorporateCulture() {
-  const [isMaximize, setIsMaximize] = useState(true);
+  const [isMaximize, setIsMaximize] = useState(false);
 
   const [cards, setCards] = useState([
     { id: 1, data: mockData, config },
