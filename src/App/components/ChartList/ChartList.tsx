@@ -1,22 +1,11 @@
-import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import { restrictToParentElement } from '@dnd-kit/modifiers';
-import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
 import type { ChartListType } from 'types/index';
 
-import ChartCard from '../ChartCard';
+import ChartCard from '../ChartCard/ChartCard';
 
 import styles from './ChartList.module.scss';
 
-function ChartList({ isMaximize, cards, setCards }: ChartListType) {
+function ChartList({ isMaximize, cards }: ChartListType) {
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
 
   useEffect(() => {
@@ -24,48 +13,25 @@ function ChartList({ isMaximize, cards, setCards }: ChartListType) {
       setHasRenderedAll(true);
     }
   }, [isMaximize, hasRenderedAll]);
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setCards((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
 
   const renderedCards = hasRenderedAll ? cards : cards.slice(0, 3);
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-      modifiers={[restrictToParentElement]}
-    >
-      <SortableContext items={cards.map((c) => c.id)} strategy={rectSortingStrategy}>
-        <div className={styles.chartList}>
-          {renderedCards.map((card, index) => {
-            const isHidden = !isMaximize && index >= 3;
+    <div className={styles.chartList}>
+      {renderedCards.map((card, index) => {
+        const isHidden = !isMaximize && index >= 3;
 
-            return (
-              <ChartCard
-                key={card.id}
-                id={card.id}
-                data={card.data}
-                config={card.config}
-                isHidden={isHidden}
-              />
-            );
-          })}
-        </div>
-      </SortableContext>
-    </DndContext>
+        return (
+          <ChartCard
+            key={card.id}
+            id={card.id}
+            data={card.data}
+            config={card.config}
+            isHidden={isHidden}
+          />
+        );
+      })}
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import ChartList from 'App/components/ChartList';
+import ChartListDraggable from 'App/components/ChartList/ChartListDraggable';
 import Button from 'components/Button';
 import BackButton from 'components/IconButtons/BackButton';
 import { routes } from 'config/routes';
@@ -26,7 +26,7 @@ function ChartListSettings() {
         </div>
         <Button onClick={() => navigate(routes.chartBuilder.create())}>Добавить график</Button>
       </div>
-      <ChartList cards={cards} setCards={setCards} isMaximize={true} />
+      <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
       <div className={styles.bottomContainer}>
         <div className={styles.btnContainer}>
           <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
