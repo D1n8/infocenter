@@ -9,16 +9,17 @@ import { sectionsData } from '../mockData';
 function Production() {
   const [isMaximize, setIsMaximize] = useState(false);
   const navigate = useNavigate();
+  const data = sectionsData['production'];
 
-  const section = sectionsData['production'];
+  const [section, setSection] = useState(data.charts);
 
   return (
     <Section
       isMaximize={isMaximize}
       setIsMaximize={setIsMaximize}
-      cards={section.charts}
-      setCards={() => {}}
-      title={section.title}
+      cards={section}
+      setCards={setSection}
+      title={data.title}
       onClick={() => navigate(routes.chartListSettings.create('production'))}
     />
   );

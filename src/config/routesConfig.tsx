@@ -18,10 +18,6 @@ export const routesConfig: RouteObject[] = [
         element: <Main />,
       },
       {
-        path: routes.auth.mask,
-        element: <AuthPage />,
-      },
-      {
         path: routes.chartListSettings.mask,
         element: <ChartListSettings />,
       },
@@ -34,5 +30,9 @@ export const routesConfig: RouteObject[] = [
         element: <Navigate to={routes.main.mask} replace />,
       },
     ],
+  },
+  {
+    path: routes.auth.mask,
+    element: <AuthPage />,
   },
 ];
