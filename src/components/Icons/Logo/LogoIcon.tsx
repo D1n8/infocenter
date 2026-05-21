@@ -1,8 +1,13 @@
-function LogoIcon() {
+type LogoType = {
+  width?: number;
+  height?: number;
+};
+
+function LogoIcon({ width = 105, height = 26 }: LogoType) {
   return (
     <svg
-      width="105"
-      height="26"
+      width={width}
+      height={height}
       viewBox="0 0 105 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
