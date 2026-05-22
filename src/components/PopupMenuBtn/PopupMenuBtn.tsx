@@ -3,11 +3,12 @@ import styles from './PopupMenuBtn.module.scss';
 type PopupMenuType = {
   icon: React.ReactNode;
   text: string;
+  onClick?: () => void;
 };
 
-function PopupMenuBtn({ icon, text }: PopupMenuType) {
+function PopupMenuBtn({ onClick, icon, text }: PopupMenuType) {
   return (
-    <button className={styles.popupBtn}>
+    <button onClick={onClick} className={styles.popupBtn}>
       {icon}
       <span>{text}</span>
     </button>

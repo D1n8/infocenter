@@ -6,6 +6,7 @@ import Edit from 'components/Icons/Edit';
 import FullScreen from 'components/Icons/FullScreen';
 import Table from 'components/Icons/Table';
 import Upload from 'components/Icons/Upload';
+import Modal from 'components/Modal';
 import PopupMenu from 'components/PopupMenu';
 import PopupMenuBtn from 'components/PopupMenuBtn';
 import ReactECharts from 'echarts-for-react';
@@ -22,6 +23,7 @@ export type ChartCardType = {
 };
 
 function ChartCard({ data, config, isHidden = false }: ChartCardType) {
+  const [fullScreenIsOpen, setFullScreenIsOpen] = useState(false);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -47,25 +49,34 @@ function ChartCard({ data, config, isHidden = false }: ChartCardType) {
   }, [data, config]);
 
   return (
-    <article className={classNames(styles.chartCard, { [styles.hidden]: isHidden })}>
-      <div ref={menuRef}>
-        <MoreVertButton
-          className={styles.moreVert}
-          onClick={() => setMenuIsOpen((prev) => !prev)}
-        />
+    <>
+      <article className={classNames(styles.chartCard, { [styles.hidden]: isHidden })}>
+        <div ref={menuRef}>
+          <MoreVertButton
+            className={styles.moreVert}
+            onClick={() => setMenuIsOpen((prev) => !prev)}
+          />
 
-        {menuIsOpen && (
-          <PopupMenu>
-            <PopupMenuBtn icon={<FullScreen />} text="Показать во весь экран" />
-            <PopupMenuBtn icon={<Table />} text="Открыть таблицу" />
-            <PopupMenuBtn icon={<Upload />} text="Экспортировать" />
-            <PopupMenuBtn icon={<Edit />} text="Изменить" />
-            <PopupMenuBtn icon={<Delete />} text="Удалить" />
-          </PopupMenu>
-        )}
-      </div>
-      <ReactECharts option={chartOption} />
-    </article>
+          {menuIsOpen && (
+            <PopupMenu>
+              <PopupMenuBtn
+                onClick={() => setFullScreenIsOpen(true)}
+                icon={<FullScreen />}
+                text="Показать во весь экран"
+              />
+              <PopupMenuBtn icon={<Table />} text="Открыть таблицу" />
+              <PopupMenuBtn icon={<Upload />} text="Экспортировать" />
+              <PopupMenuBtn icon={<Edit />} text="Изменить" />
+              <PopupMenuBtn icon={<Delete />} text="Удалить" />
+            </PopupMenu>
+          )}
+        </div>
+        <ReactECharts option={chartOption} />
+      </article>
+      <Modal isOpen={fullScreenIsOpen} onClose={() => setFullScreenIsOpen(false)}>
+        <ReactECharts option={chartOption} style={{ height: '100%' }} />
+      </Modal>
+    </>
   );
 }
 
