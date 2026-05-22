@@ -12,8 +12,8 @@ export const routes = {
     create: (sectionId: string) => `/operational-management/chart-list-settings/${sectionId}`,
   },
   chartBuilder: {
-    mask: 'chart-builder',
-    create: () => '/chart-builder',
+    mask: '/operational-management/chart-builder',
+    create: () => '/operational-management/chart-builder',
   },
   operationalManagement: {
     mask: 'operational-management',
