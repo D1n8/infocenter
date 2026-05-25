@@ -14,10 +14,18 @@ export type ChartTypeAlias =
   | 'stacked_bar'
   | 'radar';
 
+export type UIConfig = {
+  color?: string;
+  colorPalette?: string[];
+  isDonut?: boolean;
+  showLegend?: boolean;
+};
+
 export type ChartConfig = {
   title: { text: string };
   chartType: ChartTypeAlias;
   mapping: Record<string, string>;
+  uiConfig?: UIConfig;
 };
 
 export type BaseColumn = {
@@ -35,6 +43,7 @@ export type CardType = {
   id: number;
   data: RowData[];
   config: ChartConfig;
+  isHidden?: boolean;
 };
 
 export type ChartListType = {

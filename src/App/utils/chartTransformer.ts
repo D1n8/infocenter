@@ -62,7 +62,15 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         ...baseOption,
         xAxis: isHBar ? { type: 'value' } : { type: 'category', data: categories },
         yAxis: isHBar ? { type: 'category', data: categories } : { type: 'value' },
-        series: [{ type: 'bar', data: values } as BarSeriesOption],
+        series: [
+          {
+            type: 'bar',
+            data: values,
+            itemStyle: {
+              color: config.uiConfig?.color || '#5470c6',
+            },
+          } as BarSeriesOption,
+        ],
       };
     }
     if (chartType === 'line') {
