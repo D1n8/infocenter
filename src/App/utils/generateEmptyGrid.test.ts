@@ -6,9 +6,9 @@ describe('generateEmptyGrid', () => {
   it('генерируются значения для пустой таблицы', () => {
     const expectedResult = {
       columns: [
-        { key: 'col_1', name: 'Колонка 1' },
-        { key: 'col_2', name: 'Колонка 2' },
-        { key: 'col_3', name: 'Колонка 3' },
+        { key: 'col_1', name: '' },
+        { key: 'col_2', name: '' },
+        { key: 'col_3', name: '' },
       ],
       rows: [
         { col_1: '', col_2: '', col_3: '' },
