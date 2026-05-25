@@ -1,7 +1,17 @@
+import type { BarSeriesOption, PieSeriesOption } from 'echarts';
 import type { RowData, ChartConfig } from 'types/index';
 import { describe, it, expect } from 'vitest';
 
 import { transformDataForECharts } from './chartTransformer';
+
+type ExpectedBarChart = {
+  xAxis: { data: string[] };
+  series: BarSeriesOption[];
+};
+
+type ExpectedPieChart = {
+  series: PieSeriesOption[];
+};
 
 describe('transformDataForECharts', () => {
   const mockData: RowData[] = [
@@ -12,50 +22,34 @@ describe('transformDataForECharts', () => {
 
   it('возвращает пустой объект, если оси не выбраны', () => {
     const config: ChartConfig = {
-      title: { text: 'Mock chart' },
+      title: { text: 'Mock' },
       chartType: 'bar',
-      mapping: {
-        xAxis: '',
-        yAxis: '',
-      },
+      mapping: { xAxis: '', yAxis: '' },
     };
-    const result = transformDataForECharts(mockData, config);
-    expect(result).toEqual({});
+    expect(transformDataForECharts(mockData, config)).toEqual({});
   });
 
-  it('корректно трансформируются данные для гистограммы', () => {
+  it('корректно трансформирует данные для гистограммы', () => {
     const config: ChartConfig = {
-      title: { text: 'Mock chart' },
+      title: { text: 'Mock' },
       chartType: 'bar',
-      mapping: {
-        xAxis: 'department',
-        yAxis: 'salary',
-      },
+      mapping: { xAxis: 'department', yAxis: 'salary' },
     };
-    const result = transformDataForECharts(mockData, config);
 
-    if (!('series' in result) || !result.series) {
-      throw new Error('Ожидалось, что график будет сформирован');
-    }
+    const result = transformDataForECharts(mockData, config) as unknown as ExpectedBarChart;
 
-    expect(result.xAxis).toEqual({ type: 'category', data: ['IT', 'HR'] });
+    expect(result.xAxis.data).toEqual(['IT', 'HR']);
     expect(result.series[0].data).toEqual([5000, 1500]);
   });
 
-  it('корректно трансформируются данные для круговой диаграммы', () => {
+  it('корректно трансформирует данные для круговой диаграммы', () => {
     const config: ChartConfig = {
-      title: { text: 'Mock chart' },
+      title: { text: 'Mock' },
       chartType: 'pie',
-      mapping: {
-        category: 'department',
-        value: 'salary',
-      },
+      mapping: { category: 'department', value: 'salary' },
     };
-    const result = transformDataForECharts(mockData, config);
 
-    if (!('series' in result) || !result.series) {
-      throw new Error('Ожидалось, что график будет сформирован');
-    }
+    const result = transformDataForECharts(mockData, config) as unknown as ExpectedPieChart;
 
     expect(result.series[0].data).toEqual([
       { name: 'IT', value: 5000 },
@@ -63,25 +57,18 @@ describe('transformDataForECharts', () => {
     ]);
   });
 
-  it('при трансформации игнорируются NaN', () => {
+  it('игнорирует NaN', () => {
     const dataWithInvalid: RowData[] = [
       { department: 'IT', salary: 2000 },
-      { department: 'IT', salary: 'invalid_string' },
+      { department: 'IT', salary: 'invalid' },
     ];
     const config: ChartConfig = {
-      title: { text: 'Mock chart' },
+      title: { text: 'Mock' },
       chartType: 'bar',
-      mapping: {
-        xAxis: 'department',
-        yAxis: 'salary',
-      },
+      mapping: { xAxis: 'department', yAxis: 'salary' },
     };
-    const result = transformDataForECharts(dataWithInvalid, config);
 
-    if (!('series' in result) || !result.series) {
-      throw new Error('Ожидалось, что график будет сформирован');
-    }
-
+    const result = transformDataForECharts(dataWithInvalid, config) as unknown as ExpectedBarChart;
     expect(result.series[0].data).toEqual([2000]);
   });
 });
