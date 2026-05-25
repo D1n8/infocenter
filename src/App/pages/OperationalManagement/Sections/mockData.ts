@@ -1,45 +1,58 @@
-import type { CardType, ChartConfig, RowData } from 'types/index';
+import type { CardType, RowData } from 'types/index';
 
 export const mockData: RowData[] = [
   { department: 'IT', salary: 2000 },
   { department: 'IT', salary: 3000 },
   { department: 'HR', salary: 1500 },
+  { department: 'Finance', salary: 2500 },
+  { department: 'Support', salary: 1800 },
 ];
-export const config: ChartConfig = {
-  title: { text: 'ПА выпуска продукта в цехе' },
-  xAxis: 'department',
-  yAxis: 'salary',
-  chartType: 'bar',
+
+const COLORS = {
+  production: '#FADB14',
+  economy: '#52C41A',
+  safety: '#FF4D4F',
+  quality: '#002766',
+  culture: '#40A9FF',
 };
 
-export const mockCharts: CardType[] = [
-  { id: 1, data: mockData, config },
-  { id: 2, data: mockData, config },
-  { id: 3, data: mockData, config },
-  { id: 4, data: mockData, config },
-  { id: 5, data: mockData, config },
-  { id: 6, data: mockData, config },
-];
+const createMockCharts = (count: number, titlePrefix: string, color: string): CardType[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: Math.random(),
+    data: mockData,
+    config: {
+      title: { text: `${titlePrefix} - График ${i + 1}` },
+      chartType: 'bar',
+      mapping: {
+        xAxis: 'department',
+        yAxis: 'salary',
+      },
+      uiConfig: {
+        color: color,
+      },
+    },
+  }));
+};
 
 export const sectionsData: Record<string, { title: string; charts: CardType[] }> = {
   production: {
     title: 'Производство',
-    charts: mockCharts,
+    charts: createMockCharts(6, 'Производство', COLORS.production),
   },
   culture: {
     title: 'Корпоративная культура',
-    charts: mockCharts,
+    charts: createMockCharts(6, 'Культура', COLORS.culture),
   },
   economy: {
     title: 'Экономика',
-    charts: mockCharts,
+    charts: createMockCharts(6, 'Экономика', COLORS.economy),
   },
   quality: {
     title: 'Качество',
-    charts: mockCharts,
+    charts: createMockCharts(6, 'Качество', COLORS.quality),
   },
   safety: {
     title: 'Безопасность',
-    charts: mockCharts,
+    charts: createMockCharts(6, 'Безопасность', COLORS.safety),
   },
 };

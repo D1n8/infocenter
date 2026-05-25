@@ -1,25 +1,26 @@
+import { routes } from 'config/routes';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Section from '../Section';
-import { config, mockData } from '../mockData';
+import 'react-data-grid/lib/styles.css';
+import { sectionsData } from '../mockData';
 
 function Quality() {
   const [isMaximize, setIsMaximize] = useState(false);
-  const [cards, setCards] = useState([
-    { id: 1, data: mockData, config },
-    { id: 2, data: mockData, config },
-    { id: 3, data: mockData, config },
-    { id: 4, data: mockData, config },
-    { id: 5, data: mockData, config },
-    { id: 6, data: mockData, config },
-  ]);
+  const navigate = useNavigate();
+  const data = sectionsData['quality'];
+
+  const [section, setSection] = useState(data.charts);
+
   return (
     <Section
       isMaximize={isMaximize}
       setIsMaximize={setIsMaximize}
-      cards={cards}
-      setCards={setCards}
-      title="Качество"
+      cards={section}
+      setCards={setSection}
+      title={data.title}
+      onClick={() => navigate(routes.chartListSettings.create('quality'))}
     />
   );
 }

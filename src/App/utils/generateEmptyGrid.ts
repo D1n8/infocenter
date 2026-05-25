@@ -3,7 +3,7 @@ import type { BaseColumn, RowData } from 'types/index';
 export function generateEmptyGrid(colsCount: number, rowsCount: number) {
   const columns: BaseColumn[] = Array.from({ length: colsCount }, (_, i) => ({
     key: `col_${i + 1}`,
-    name: `Колонка ${i + 1}`,
+    name: ``,
   }));
 
   const emptyRowTemplate: RowData = {};
