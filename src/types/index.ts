@@ -2,13 +2,22 @@ import type { Column } from 'react-data-grid';
 
 export type RowData = Record<string, string | number>;
 
+export type ChartTypeAlias =
+  | 'bar'
+  | 'horizontal_bar'
+  | 'line'
+  | 'pie'
+  | 'polar'
+  | 'scatter'
+  | 'multi_line'
+  | 'stacked_line'
+  | 'stacked_bar'
+  | 'radar';
+
 export type ChartConfig = {
-  title: {
-    text: string;
-  };
-  xAxis: string;
-  yAxis: string;
-  chartType: 'bar' | 'pie';
+  title: { text: string };
+  chartType: ChartTypeAlias;
+  mapping: Record<string, string>;
 };
 
 export type BaseColumn = {

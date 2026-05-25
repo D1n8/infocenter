@@ -16,13 +16,7 @@ type DropdownProps = {
   placeholder?: string;
 };
 
-export const Dropdown: React.FC<DropdownProps> = ({
-  id,
-  options,
-  value,
-  onChange,
-  placeholder = 'Выберите...',
-}) => {
+function Dropdown({ id, options, value, onChange, placeholder = 'Выберите...' }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -97,4 +91,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
       )}
     </div>
   );
-};
+}
+
+export default Dropdown;

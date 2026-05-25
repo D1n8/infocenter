@@ -13,9 +13,11 @@ describe('transformDataForECharts', () => {
   it('возвращает пустой объект, если оси не выбраны', () => {
     const config: ChartConfig = {
       title: { text: 'Mock chart' },
-      xAxis: '',
-      yAxis: '',
       chartType: 'bar',
+      mapping: {
+        xAxis: '',
+        yAxis: '',
+      },
     };
     const result = transformDataForECharts(mockData, config);
     expect(result).toEqual({});
@@ -24,13 +26,15 @@ describe('transformDataForECharts', () => {
   it('корректно трансформируются данные для гистограммы', () => {
     const config: ChartConfig = {
       title: { text: 'Mock chart' },
-      xAxis: 'department',
-      yAxis: 'salary',
       chartType: 'bar',
+      mapping: {
+        xAxis: 'department',
+        yAxis: 'salary',
+      },
     };
     const result = transformDataForECharts(mockData, config);
 
-    if (!result.series) {
+    if (!('series' in result) || !result.series) {
       throw new Error('Ожидалось, что график будет сформирован');
     }
 
@@ -41,13 +45,15 @@ describe('transformDataForECharts', () => {
   it('корректно трансформируются данные для круговой диаграммы', () => {
     const config: ChartConfig = {
       title: { text: 'Mock chart' },
-      xAxis: 'department',
-      yAxis: 'salary',
       chartType: 'pie',
+      mapping: {
+        category: 'department',
+        value: 'salary',
+      },
     };
     const result = transformDataForECharts(mockData, config);
 
-    if (!result.series) {
+    if (!('series' in result) || !result.series) {
       throw new Error('Ожидалось, что график будет сформирован');
     }
 
@@ -64,13 +70,15 @@ describe('transformDataForECharts', () => {
     ];
     const config: ChartConfig = {
       title: { text: 'Mock chart' },
-      xAxis: 'department',
-      yAxis: 'salary',
       chartType: 'bar',
+      mapping: {
+        xAxis: 'department',
+        yAxis: 'salary',
+      },
     };
     const result = transformDataForECharts(dataWithInvalid, config);
 
-    if (!result.series) {
+    if (!('series' in result) || !result.series) {
       throw new Error('Ожидалось, что график будет сформирован');
     }
 

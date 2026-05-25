@@ -1,4 +1,4 @@
-import Button from 'components/Button';
+import { CHART_SCHEMAS } from 'config/chartSchemas';
 import ReactECharts from 'echarts-for-react';
 import React, { useState, useMemo } from 'react';
 import { DataGrid } from 'react-data-grid';
@@ -25,9 +25,11 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
     title: { text: 'Chart Builder' },
-    xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
-    yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
     chartType: 'bar',
+    mapping: {
+      xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
+      yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
+    },
   });
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -44,8 +46,7 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
 
     setChartConfig((prev) => ({
       ...prev,
-      xAxis: '',
-      yAxis: '',
+      mapping: {},
     }));
   };
 
@@ -55,16 +56,21 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
 
   const removeColumn = (key: string) => {
     setColumns((prev) => prev.filter((c) => c.key !== key));
-    setChartConfig((prev) => ({
-      ...prev,
-      xAxis: prev.xAxis === key ? '' : prev.xAxis,
-      yAxis: prev.yAxis === key ? '' : prev.yAxis,
-    }));
+
+    setChartConfig((prev) => {
+      const newMapping = { ...prev.mapping };
+      for (const mapKey in newMapping) {
+        if (newMapping[mapKey] === key) {
+          newMapping[mapKey] = '';
+        }
+      }
+      return { ...prev, mapping: newMapping };
+    });
   };
 
   const addColumn = () => {
     const newKey = `col_${Date.now()}`;
-    setColumns((prev) => [...prev, { key: newKey, name: 'Новая' }]);
+    setColumns((prev) => [...prev, { key: newKey, name: '' }]);
     setRows((prev) => prev.map((r) => ({ ...r, [newKey]: '' })));
   };
 
@@ -83,6 +89,8 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
   const gridColumns: CustomColumn[] = [
     ...columns.map((col) => ({
       ...col,
+      resizable: true,
+      minWidth: 100,
       renderEditCell: CustomTextEditor,
       renderHeaderCell: EditableHeaderCell,
       onNameChange: updateColumnName,
@@ -92,6 +100,7 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
       key: 'actions',
       name: '',
       width: 50,
+      resizable: false,
       editable: false,
       renderCell: DeleteRowCell,
       onRemoveRow: removeRow,
@@ -102,6 +111,13 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
     return transformDataForECharts(rows, chartConfig);
   }, [rows, chartConfig]);
 
+  const isChartReady = useMemo(() => {
+    const currentSchema = CHART_SCHEMAS[chartConfig.chartType] || [];
+    return currentSchema
+      .filter((field) => field.required)
+      .every((field) => chartConfig.mapping[field.key]);
+  }, [chartConfig]);
+
   return (
     <div className={styles.widget}>
       <ChartConfigMenu
@@ -109,28 +125,34 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
         chartConfig={chartConfig}
         setChartConfig={setChartConfig}
       />
-      <div className={styles.btnsContainer}>
-        <Button onClick={addRow}>+ Добавить строку</Button>
-        <Button onClick={addColumn}>+ Добавить колонку</Button>
+
+      <div className={styles.chartContainer}>
+        {isChartReady ? (
+          <ReactECharts option={chartOption} style={{ height: '100%' }} />
+        ) : (
+          <p className={styles.chartInfo}>Выберите все обязательные оси для построения графика</p>
+        )}
       </div>
 
-      <div className={styles.widgetContent}>
-        <div className={styles.dataGridContainer} onPaste={handlePaste} tabIndex={0}>
-          <DataGrid
-            columns={gridColumns}
-            rows={rows}
-            onRowsChange={setRows}
-            style={{ height: 400 }}
-          />
+      <div className={styles.dataGridSection} onPaste={handlePaste} tabIndex={0}>
+        <div className={styles.tableAndColBtnWrapper}>
+          <div className={styles.gridContainer}>
+            <DataGrid
+              columns={gridColumns}
+              rows={rows}
+              onRowsChange={setRows}
+              className={styles.grid}
+            />
+          </div>
+
+          <button className={styles.addBtn} onClick={addColumn} title="Добавить колонку">
+            +
+          </button>
         </div>
 
-        <div className={styles.chartContainer}>
-          {chartConfig.xAxis && chartConfig.yAxis ? (
-            <ReactECharts option={chartOption} style={{ height: '100%' }} />
-          ) : (
-            <p className={styles.chartInfo}>Выберите оси X и Y для построения графика</p>
-          )}
-        </div>
+        <button className={styles.addBtn} onClick={addRow} title="Добавить строку">
+          +
+        </button>
       </div>
     </div>
   );
