@@ -11,7 +11,7 @@ function ChartBuilerPage() {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <BackButton onClick={() => navigate(-1)}>Назад</BackButton>
+        <BackButton onClick={() => navigate(-1)} />
         <h2 className={styles.title}>Добавление графика</h2>
       </div>
       <ChartBuilder initialColumns={columns} initialRows={rows} />

@@ -5,6 +5,7 @@ import ChartListSettings from 'App/pages/ChartListSettings';
 import OperationalManagement from 'App/pages/OperationalManagement';
 // import Main from '../App/pages/Main';
 import OpManLayout from 'App/pages/OperationalManagement/OpManLayout';
+import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
 import { Navigate, type RouteObject } from 'react-router';
 
 import { routes } from './routes';
@@ -18,6 +19,10 @@ export const routesConfig: RouteObject[] = [
       //   index: true,
       //   element: <Main />,
       // },
+      {
+        path: routes.settings.mask,
+        element: <SettingsPage />,
+      },
       {
         path: routes.operationalManagement.mask,
         element: <OpManLayout />,

@@ -7,12 +7,17 @@
   border: none;
   background-color: transparent;
   cursor: pointer;
+  transition: all ease 0.15s;
 
   span {
     font-size: 16px;
     font-family: 'Inter';
     color: var(--main-text);
   }
+}
+
+.popupBtn:hover {
+  background-color: var(--gray-30);
 }
 
 .popupBtn:not(:last-child) {
