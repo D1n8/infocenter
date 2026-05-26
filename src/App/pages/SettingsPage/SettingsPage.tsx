@@ -1,4 +1,3 @@
-// import Button from 'components/Button';
 import BackButton from 'components/IconButtons/BackButton';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
@@ -25,15 +24,6 @@ function SettingsPage() {
           <SettingsItem>Управление ролями</SettingsItem>
           <SettingsItem>Системные настройки</SettingsItem>
         </section>
-
-        {/* <div className={styles.bottomContainer}>
-          <div className={styles.btnContainer}>
-            <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
-              Отменить
-            </Button>
-            <Button>Сохранить</Button>
-          </div>
-        </div> */}
       </div>
     </div>
   );

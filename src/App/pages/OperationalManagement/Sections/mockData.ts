@@ -37,7 +37,7 @@ const createMockCharts = (count: number, titlePrefix: string, color: string): Ca
 export const sectionsData: Record<string, { title: string; charts: CardType[] }> = {
   production: {
     title: 'Производство',
-    charts: createMockCharts(6, 'Производство', COLORS.production),
+    charts: createMockCharts(14, 'Производство', COLORS.production),
   },
   culture: {
     title: 'Корпоративная культура',

@@ -1,33 +1,24 @@
-import { useEffect, useState } from 'react';
 import type { ChartListType } from 'types/index';
 
 import ChartCard from '../ChartCard/ChartCard';
 
 import styles from './ChartList.module.scss';
 
-function ChartList({ isMaximize, cards }: ChartListType) {
-  const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
+function ChartList({ isMaximize, cards, limit = '6' }: ChartListType) {
+  const currentLimit = isMaximize ? (limit === 'all' ? cards.length : Number(limit)) : 3;
 
-  useEffect(() => {
-    if (isMaximize && !hasRenderedAll) {
-      setHasRenderedAll(true);
-    }
-  }, [isMaximize, hasRenderedAll]);
-
-  const renderedCards = hasRenderedAll ? cards : cards.slice(0, 3);
+  const renderedCards = cards.slice(0, currentLimit);
 
   return (
     <div className={styles.chartList}>
-      {renderedCards.map((card, index) => {
-        const isHidden = !isMaximize && index >= 3;
-
+      {renderedCards.map((card) => {
         return (
           <ChartCard
             key={card.id}
             id={card.id}
             data={card.data}
             config={card.config}
-            isHidden={isHidden}
+            isHidden={false}
           />
         );
       })}

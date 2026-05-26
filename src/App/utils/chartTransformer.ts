@@ -23,11 +23,12 @@ type FormatterParams = {
 };
 
 export function transformDataForECharts(data: RowData[], config: ChartConfig): EChartsOption {
-  const { chartType, mapping, title } = config;
+  const { chartType, mapping, title, uiConfig } = config;
 
   const baseOption: EChartsOption = {
     title: { text: title.text, textStyle: { fontSize: 14, fontWeight: 400 } },
     tooltip: { trigger: 'axis' },
+    color: uiConfig?.colorPalette || (uiConfig?.color ? [uiConfig.color] : undefined),
   };
 
   if (chartType === 'scatter') {
@@ -58,6 +59,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         {
           type: 'scatter',
           data: scatterData,
+          itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           label: {
             show: !!mapping.name,
             formatter: (params) => {
@@ -88,6 +90,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
           type: 'gauge',
           progress: { show: true },
           detail: { valueAnimation: true, formatter: '{value}' },
+          itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           data: [{ value: Number(totalValue.toFixed(1)), name: title.text }],
         } as GaugeSeriesOption,
       ],
@@ -235,7 +238,13 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         ...baseOption,
         xAxis: isHBar ? { type: 'value' } : { type: 'category', data: categories },
         yAxis: isHBar ? { type: 'category', data: categories } : { type: 'value' },
-        series: [{ type: 'bar', data: values } as BarSeriesOption],
+        series: [
+          {
+            type: 'bar',
+            data: values,
+            itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
+          } as BarSeriesOption,
+        ],
       };
     }
     if (chartType === 'line') {
@@ -243,7 +252,14 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         ...baseOption,
         xAxis: { type: 'category', data: categories },
         yAxis: { type: 'value' },
-        series: [{ type: 'line', data: values } as LineSeriesOption],
+        series: [
+          {
+            type: 'line',
+            data: values,
+            itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
+            lineStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
+          } as LineSeriesOption,
+        ],
       };
     }
     if (chartType === 'pie') {
@@ -265,7 +281,14 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         polar: { radius: [30, '80%'] },
         angleAxis: { type: 'category', data: categories },
         radiusAxis: { max: 'dataMax' },
-        series: [{ type: 'bar', data: values, coordinateSystem: 'polar' } as BarSeriesOption],
+        series: [
+          {
+            type: 'bar',
+            data: values,
+            coordinateSystem: 'polar',
+            itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
+          } as BarSeriesOption,
+        ],
       };
     }
     if (chartType === 'funnel') {
