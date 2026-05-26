@@ -7,6 +7,10 @@ export const routes = {
     mask: 'auth',
     create: () => '/auth',
   },
+  settings: {
+    mask: 'settings',
+    create: () => '/settings',
+  },
   chartListSettings: {
     mask: '/operational-management/chart-list-settings/:sectionId',
     create: (sectionId: string) => `/operational-management/chart-list-settings/${sectionId}`,
