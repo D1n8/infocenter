@@ -1,12 +1,14 @@
-import OperationalManagement from '../OperationalManagement';
+import Navigation from 'App/components/Navigation';
+import { Outlet } from 'react-router-dom';
 
 import styles from './Main.module.scss';
 
 function Main() {
   return (
     <>
-      <div className={styles.main}>
-        <OperationalManagement />
+      <Navigation />
+      <div className={styles.mainContent}>
+        <Outlet />
       </div>
     </>
   );
