@@ -89,3 +89,21 @@
     background-color: #f5f5f5;
   }
 }
+
+.bottomContainer {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+
+.btnContainer {
+  display: flex;
+  gap: 40px;
+  align-items: end;
+}
+
+.cancelBtn {
+  background-color: transparent;
+  color: var(--main-text);
+  border: 1px solid #e5e5e5;
+}

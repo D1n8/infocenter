@@ -12,7 +12,12 @@ export type ChartTypeAlias =
   | 'multi_line'
   | 'stacked_line'
   | 'stacked_bar'
-  | 'radar';
+  | 'radar'
+  | 'funnel'
+  | 'treemap'
+  | 'gauge'
+  | 'candlestick'
+  | 'cumulative_plan_fact';
 
 export type UIConfig = {
   color?: string;

@@ -1,7 +1,9 @@
+import Button from 'components/Button';
 import { CHART_SCHEMAS } from 'config/chartSchemas';
 import ReactECharts from 'echarts-for-react';
 import React, { useState, useMemo } from 'react';
 import { DataGrid } from 'react-data-grid';
+import { useNavigate } from 'react-router';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
 import { parseClipboardData } from 'utils/clipboard';
@@ -22,6 +24,8 @@ type ChartBuilderProps = {
 function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderProps) {
   const [columns, setColumns] = useState<BaseColumn[]>(initialColumns);
   const [rows, setRows] = useState<RowData[]>(initialRows);
+
+  const navigate = useNavigate();
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
     title: { text: 'Новый график' },
@@ -153,6 +157,15 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
         <button className={styles.addBtn} onClick={addRow} title="Добавить строку">
           +
         </button>
+      </div>
+
+      <div className={styles.bottomContainer}>
+        <div className={styles.btnContainer}>
+          <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
+            Отменить
+          </Button>
+          <Button>Сохранить</Button>
+        </div>
       </div>
     </div>
   );
