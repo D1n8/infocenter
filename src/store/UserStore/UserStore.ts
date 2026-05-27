@@ -4,6 +4,7 @@ import type {
   UserPermissionsType,
   UserPermissionsRequestType,
   PermissionGrantType,
+  UnitTreeItem,
 } from 'types/index';
 
 import {
@@ -19,7 +20,8 @@ type PrivateFields =
   | '_user'
   | '_managedUser'
   | '_managedPermissions'
-  | '_usersList';
+  | '_usersList'
+  | '_unitsTree';
 
 export default class UserStore {
   private _error = '';
@@ -27,6 +29,7 @@ export default class UserStore {
   private _user: UserTypeModel | null = null;
 
   private _usersList: UserTypeModel[] = [];
+  private _unitsTree: UnitTreeItem[] = [];
 
   private _managedUser: UserTypeModel | null = null;
   private _managedPermissions: UserPermissionsType | null = null;
@@ -37,6 +40,7 @@ export default class UserStore {
       _isLoading: observable,
       _user: observable,
       _usersList: observable,
+      _unitsTree: observable,
       _managedUser: observable,
       _managedPermissions: observable,
 
@@ -44,9 +48,10 @@ export default class UserStore {
       error: computed,
       isLoading: computed,
       user: computed,
-      usersList: computed,
       managedUser: computed,
       managedPermissions: computed,
+      usersList: computed,
+      unitsTree: computed,
     });
   }
 
@@ -76,6 +81,10 @@ export default class UserStore {
 
   get usersList(): UserTypeModel[] {
     return this._usersList;
+  }
+
+  get unitsTree(): UnitTreeItem[] {
+    return this._unitsTree;
   }
 
   async loginUser(login: string, password: string) {
@@ -170,9 +179,11 @@ export default class UserStore {
     });
   }
 
-  async createUser(user: CreateUserType) {
+  async createUser(user: CreateUserType): Promise<string | null> {
+    this._isLoading = true;
+    this._error = '';
     try {
-      await api.post('/users/', {
+      const response = await api.post<{ id: string }>('/users/', {
         login: user.login,
         full_name: user.full_name,
         role: user.role,
@@ -181,8 +192,16 @@ export default class UserStore {
         is_active: user.is_active,
         password: user.password,
       });
+      return response.data.id;
     } catch {
-      this._error = 'Не удалось создать пользователя';
+      runInAction(() => {
+        this._error = 'Не удалось создать пользователя';
+      });
+      return null;
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
     }
   }
 
@@ -197,6 +216,24 @@ export default class UserStore {
     } catch {
       runInAction(() => {
         this._error = 'Не удалось получить список пользователей';
+      });
+    }
+  }
+
+  async fetchUnitsTree() {
+    this._isLoading = true;
+    try {
+      const response = await api.get<UnitTreeItem[]>('/permissions/units/tree');
+      runInAction(() => {
+        this._unitsTree = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось загрузить структуру подразделений';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
       });
     }
   }

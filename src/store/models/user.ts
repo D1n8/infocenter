@@ -1,4 +1,4 @@
-export type RoleType = 'inspector' | 'admin';
+export type RoleType = 'user' | 'admin';
 
 export type UserType = {
   login: string;

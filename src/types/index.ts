@@ -92,3 +92,10 @@ export type PermissionGrantType = {
 export type UserPermissionsRequestType = {
   permissions: PermissionGrantType[];
 };
+
+export type UnitTreeItem = {
+  id: string;
+  name: string;
+  level: LevelType;
+  children?: UnitTreeItem[];
+};
