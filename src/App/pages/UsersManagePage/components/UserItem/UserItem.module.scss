@@ -1,0 +1,17 @@
+.userItem {
+  width: 100%;
+  display: flex;
+  padding: 12px 30px;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  transition: all ease 0.15s;
+}
+
+.userItem:hover {
+  background-color: var(--gray-30);
+}
+
+.text {
+  color: var(--main-text);
+}

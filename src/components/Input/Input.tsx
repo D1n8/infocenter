@@ -10,11 +10,11 @@ type InputType = InputHTMLAttributes<HTMLInputElement> & {
 function Input({ placeholder, className, type = 'text', icon, ...props }: InputType) {
   if (icon) {
     return (
-      <div className={styles.inputWrapper}>
+      <div className={classNames(className, styles.inputWrapper)}>
         <span className={styles.icon}>{icon}</span>
         <input
           {...props}
-          className={classNames(className, styles.input, styles.withIcon)}
+          className={classNames(styles.input, styles.withIcon)}
           type={type}
           placeholder={placeholder}
         />

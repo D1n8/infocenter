@@ -1,25 +1,30 @@
+import classNames from 'classnames';
 import Button from 'components/Button';
 import BackButton from 'components/IconButtons/BackButton';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
 import { useNavigate } from 'react-router-dom';
+import layoutStyles from 'styles/shared/Layout.module.scss';
 
 import styles from './UsersManagePage.module.scss';
+import UserItem from './components/UserItem';
 
 function UserManagePage() {
   const navigate = useNavigate();
   return (
     <div>
-      <div className={styles.titleContainer}>
+      <div className={layoutStyles.titleContainer}>
         <BackButton onClick={() => navigate(-1)} />
-        <h2 className={styles.title}>Управление пользователями</h2>
+        <h2 className={layoutStyles.title}>Управление пользователями</h2>
       </div>
-      <div className={styles.usersContainer}>
+      <div className={layoutStyles.settingsContainer}>
         <div className={styles.topContainer}>
-          <Input icon={<Search />} placeholder="Поиск" />
+          <Input className={layoutStyles.settingsInput} icon={<Search />} placeholder="Поиск" />
           <Button>Добавить пользователя</Button>
         </div>
-        <section className={styles.usersList}>asdf</section>
+        <section className={classNames(styles.usersList, layoutStyles.settingsMenu)}>
+          <UserItem>Степа Степка</UserItem>
+        </section>
       </div>
     </div>
   );
