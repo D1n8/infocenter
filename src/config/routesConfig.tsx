@@ -6,52 +6,67 @@ import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { routes } from './routes';
 
 export const routesConfig: RouteObject[] = [
   {
-    path: routes.main.mask,
-    element: <App />,
+    element: <RequireAuth />,
     children: [
       {
-        path: routes.settings.mask,
-        element: <SettingsPage />,
-      },
-      {
-        path: routes.profile.mask,
-        element: <Profile />,
-      },
-      {
-        element: <Main />,
+        path: routes.main.mask,
+        element: <App />,
         children: [
           {
-            index: true,
+            path: routes.settings.mask,
+            element: <SettingsPage />,
+          },
+          {
+            path: routes.profile.mask,
+            element: <Profile />,
+          },
+          {
+            element: <Main />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to={routes.operationalManagement.mask} replace />,
+              },
+              {
+                path: routes.operationalManagement.mask,
+                element: <OperationalManagement />,
+              },
+              {
+                path: routes.chartListSettings.mask,
+                element: <ChartListSettings />,
+              },
+              {
+                path: routes.chartBuilder.mask,
+                element: <ChartBuilderPage />,
+              },
+            ],
+          },
+          {
+            path: '*',
             element: <Navigate to={routes.operationalManagement.mask} replace />,
-          },
-          {
-            path: routes.operationalManagement.mask,
-            element: <OperationalManagement />,
-          },
-          {
-            path: routes.chartListSettings.mask,
-            element: <ChartListSettings />,
-          },
-          {
-            path: routes.chartBuilder.mask,
-            element: <ChartBuilderPage />,
           },
         ],
       },
     ],
   },
   {
-    path: routes.auth.mask,
-    element: <AuthPage />,
+    element: <RequireGuest />,
+    children: [
+      {
+        path: routes.auth.mask,
+        element: <AuthPage />,
+      },
+    ],
   },
   {
     path: '*',
-    element: <Navigate to={routes.main.mask} replace />,
+    element: <Navigate to={routes.auth.mask} replace />,
   },
 ];

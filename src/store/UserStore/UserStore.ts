@@ -1,8 +1,7 @@
-import { BASE_URL } from 'App/consts';
-import axios from 'axios';
+import { api } from 'config/api';
 import { computed, makeObservable, observable, runInAction } from 'mobx';
 
-import { type UserTypeModel } from '../models/user';
+import { normalizeUserType, type UserTypeModel } from '../models/user';
 
 type PrivateFields = '_error' | '_isLoading' | '_user';
 
@@ -45,18 +44,57 @@ export default class UserStore {
     this._isLoading = true;
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/login`, {
+      const response = await api.post('/auth/login', {
         login: login,
         password: password,
       });
 
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+
+      const userResponse = await api.get('/users/me');
+
       runInAction(() => {
-        // this._user = normalizeUserType(response)
-        console.log(response);
+        this._user = normalizeUserType(userResponse.data);
       });
     } catch {
-      console.error('qewrewr');
+      runInAction(() => {
+        this._error = 'Не удалось авторизоваться';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
     }
+  }
+
+  async checkAuth() {
+    if (!localStorage.getItem('access_token')) {
+      return;
+    }
+
+    this._isLoading = true;
+
+    try {
+      const userResponse = await api.get('/users/me');
+      runInAction(() => {
+        this._user = normalizeUserType(userResponse.data);
+      });
+    } catch {
+      this.logout();
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    runInAction(() => {
+      this._user = null;
+    });
   }
 }
 
