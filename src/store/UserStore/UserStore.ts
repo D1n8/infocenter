@@ -13,7 +13,13 @@ import {
   type UserTypeModel,
 } from '../models/user';
 
-type PrivateFields = '_error' | '_isLoading' | '_user' | '_managedUser' | '_managedPermissions';
+type PrivateFields =
+  | '_error'
+  | '_isLoading'
+  | '_user'
+  | '_managedUser'
+  | '_managedPermissions'
+  | '_usersList';
 
 export default class UserStore {
   private _error = '';
@@ -30,6 +36,7 @@ export default class UserStore {
       _error: observable,
       _isLoading: observable,
       _user: observable,
+      _usersList: observable,
       _managedUser: observable,
       _managedPermissions: observable,
 
@@ -37,6 +44,7 @@ export default class UserStore {
       error: computed,
       isLoading: computed,
       user: computed,
+      usersList: computed,
       managedUser: computed,
       managedPermissions: computed,
     });
@@ -181,13 +189,15 @@ export default class UserStore {
   async fetchUsersList() {
     this._usersList = [];
     try {
-      const response = await api.get('/users');
+      const response = await api.get<UserTypeApi[]>('/users/');
 
       runInAction(() => {
-        this._usersList = response.data;
+        this._usersList = response.data.map(normalizeUserType);
       });
     } catch {
-      this._error = 'Не удалось получить список пользователей';
+      runInAction(() => {
+        this._error = 'Не удалось получить список пользователей';
+      });
     }
   }
 

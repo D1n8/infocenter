@@ -5,7 +5,9 @@ import Input from 'components/Input';
 import PageTitle from 'components/PageTitle';
 import { routes } from 'config/routes';
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRootStore } from 'store/RootStore/RootStore';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 
 import styles from './UsersListPage.module.scss';
@@ -13,6 +15,14 @@ import UserItem from './components/UserItem';
 
 const UsersListPage = observer(() => {
   const navigate = useNavigate();
+  const { userStore } = useRootStore();
+
+  useEffect(() => {
+    userStore.fetchUsersList();
+  }, [userStore]);
+
+  const usersList = userStore.usersList;
+
   return (
     <>
       <PageTitle title="Управление пользователями" onNavigate={navigate} />
@@ -26,16 +36,14 @@ const UsersListPage = observer(() => {
         </div>
 
         <section className={classNames(styles.usersList, layoutStyles.settingsMenu)}>
-          <UserItem
-            fullName={'Stepa Stepan dsa dsdasdasd'}
-            job={'Главный технолог'}
-            href={routes.adminUserManage.create('1')}
-          />
-          <UserItem
-            fullName={'Ivan Ivanov'}
-            job={'Инженер'}
-            href={routes.adminUserManage.create('2')}
-          />
+          {usersList.map((user) => (
+            <UserItem
+              key={user.id}
+              fullName={user.fullName}
+              job={user.jobTitle}
+              href={routes.adminUserManage.create(user.id)}
+            />
+          ))}
         </section>
 
         <div className={layoutStyles.bottomContainer}>
