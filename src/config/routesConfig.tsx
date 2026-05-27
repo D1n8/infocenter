@@ -5,7 +5,9 @@ import ChartListSettings from 'App/pages/ChartListSettings';
 import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
+import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import UsersManagePage from 'App/pages/UsersManagePage';
 import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
@@ -21,7 +23,17 @@ export const routesConfig: RouteObject[] = [
         children: [
           {
             path: routes.settings.mask,
-            element: <SettingsPage />,
+            element: <SettingsLayout />,
+            children: [
+              {
+                index: true,
+                element: <SettingsPage />,
+              },
+              {
+                path: routes.adminUsersManage.mask,
+                element: <UsersManagePage />,
+              },
+            ],
           },
           {
             path: routes.profile.mask,

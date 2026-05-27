@@ -1,6 +1,7 @@
 import BackButton from 'components/IconButtons/BackButton';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
+import { routes } from 'config/routes';
 import { useNavigate } from 'react-router-dom';
 
 import styles from './SettingsPage.module.scss';
@@ -20,7 +21,9 @@ function SettingsPage() {
         <section className={styles.settingsList}>
           <SettingsItem>Пользовательские настройки</SettingsItem>
           <SettingsItem>Предприятия</SettingsItem>
-          <SettingsItem>Управление пользователями</SettingsItem>
+          <SettingsItem href={routes.adminUsersManage.create()}>
+            Управление пользователями
+          </SettingsItem>
           <SettingsItem>Управление ролями</SettingsItem>
           <SettingsItem>Системные настройки</SettingsItem>
         </section>
