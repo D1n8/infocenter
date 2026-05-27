@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import Button from 'components/Button';
-import BackButton from 'components/IconButtons/BackButton';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
+import PageTitle from 'components/PageTitle';
 import { routes } from 'config/routes';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
@@ -15,14 +15,14 @@ const UsersListPage = observer(() => {
   const navigate = useNavigate();
   return (
     <>
-      <div className={layoutStyles.titleContainer}>
-        <BackButton onClick={() => navigate(-1)} />
-        <h2 className={layoutStyles.title}>Управление пользователями</h2>
-      </div>
+      <PageTitle title="Управление пользователями" onNavigate={navigate} />
+
       <div className={layoutStyles.settingsContainer}>
         <div className={styles.topContainer}>
           <Input className={layoutStyles.settingsInput} icon={<Search />} placeholder="Поиск" />
-          <Button>Добавить пользователя</Button>
+          <Button onClick={() => navigate(routes.adminCreateUser.create())}>
+            Добавить пользователя
+          </Button>
         </div>
 
         <section className={classNames(styles.usersList, layoutStyles.settingsMenu)}>

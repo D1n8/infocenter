@@ -82,3 +82,13 @@ export type PermissionType = {
 };
 
 export type UserPermissionsType = PermissionType[];
+
+export type PermissionGrantType = {
+  unit_id: string;
+  block: BlockType | 'all';
+  action: ActionType;
+};
+
+export type UserPermissionsRequestType = {
+  permissions: PermissionGrantType[];
+};

@@ -7,6 +7,7 @@ import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import UserCreatePage from 'App/pages/UserCreatePage';
 import UserManagePage from 'App/pages/UserManagePage';
 import UsersListPage from 'App/pages/UsersListPage';
 import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
@@ -37,6 +38,10 @@ export const routesConfig: RouteObject[] = [
               {
                 path: routes.adminUserManage.mask,
                 element: <UserManagePage />,
+              },
+              {
+                path: routes.adminCreateUser.mask,
+                element: <UserCreatePage />,
               },
             ],
           },

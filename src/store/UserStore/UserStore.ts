@@ -1,8 +1,17 @@
 import { api } from 'config/api';
 import { computed, makeObservable, observable, runInAction } from 'mobx';
-import type { UserPermissionsType } from 'types/index';
+import type {
+  UserPermissionsType,
+  UserPermissionsRequestType,
+  PermissionGrantType,
+} from 'types/index';
 
-import { normalizeUserType, type UserTypeApi, type UserTypeModel } from '../models/user';
+import {
+  normalizeUserType,
+  type CreateUserType,
+  type UserTypeApi,
+  type UserTypeModel,
+} from '../models/user';
 
 type PrivateFields = '_error' | '_isLoading' | '_user' | '_managedUser' | '_managedPermissions';
 
@@ -10,6 +19,8 @@ export default class UserStore {
   private _error = '';
   private _isLoading = false;
   private _user: UserTypeModel | null = null;
+
+  private _usersList: UserTypeModel[] = [];
 
   private _managedUser: UserTypeModel | null = null;
   private _managedPermissions: UserPermissionsType | null = null;
@@ -53,6 +64,10 @@ export default class UserStore {
 
   get managedPermissions(): UserPermissionsType | null {
     return this._managedPermissions;
+  }
+
+  get usersList(): UserTypeModel[] {
+    return this._usersList;
   }
 
   async loginUser(login: string, password: string) {
@@ -145,6 +160,78 @@ export default class UserStore {
       this._managedPermissions = null;
       this._error = '';
     });
+  }
+
+  async createUser(user: CreateUserType) {
+    try {
+      await api.post('/users/', {
+        login: user.login,
+        full_name: user.full_name,
+        role: user.role,
+        job_title: user.job_title,
+        email: user.email,
+        is_active: user.is_active,
+        password: user.password,
+      });
+    } catch {
+      this._error = 'Не удалось создать пользователя';
+    }
+  }
+
+  async fetchUsersList() {
+    this._usersList = [];
+    try {
+      const response = await api.get('/users');
+
+      runInAction(() => {
+        this._usersList = response.data;
+      });
+    } catch {
+      this._error = 'Не удалось получить список пользователей';
+    }
+  }
+
+  async grantPermissions(userId: string, payload: UserPermissionsRequestType) {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      const response = await api.post<UserPermissionsType>(`/permissions/users/${userId}`, payload);
+
+      runInAction(() => {
+        this._managedPermissions = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось выдать права пользователю';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async revokePermissions(userId: string, payload: PermissionGrantType[]) {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      await api.delete(`/permissions/users/${userId}`, { data: payload });
+      const response = await api.get<UserPermissionsType>(`/permissions/users/${userId}`);
+
+      runInAction(() => {
+        this._managedPermissions = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось отозвать права у пользователя';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
   }
 }
 
