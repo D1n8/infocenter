@@ -63,3 +63,22 @@ export type SectionType = ChartListType & {
   title?: string;
   onClick?: () => void;
 };
+
+export type LevelType = 'enterprise' | 'shop' | 'area';
+
+export type BlockType = 'safety' | 'quality' | 'production' | 'economy' | 'culture';
+
+export type ActionType = 'view' | 'manage' | 'manage_permissions';
+
+export type PermissionType = {
+  id: string;
+  unit: {
+    id: string;
+    name: string;
+    level_type: LevelType;
+  };
+  block: BlockType | 'all';
+  action: ActionType;
+};
+
+export type UserPermissionsType = PermissionType[];

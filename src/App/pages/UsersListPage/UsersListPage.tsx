@@ -3,13 +3,15 @@ import Button from 'components/Button';
 import BackButton from 'components/IconButtons/BackButton';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
+import { routes } from 'config/routes';
+import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 
 import styles from './UsersListPage.module.scss';
 import UserItem from './components/UserItem';
 
-function UsersListPage() {
+const UsersListPage = observer(() => {
   const navigate = useNavigate();
   return (
     <>
@@ -24,10 +26,16 @@ function UsersListPage() {
         </div>
 
         <section className={classNames(styles.usersList, layoutStyles.settingsMenu)}>
-          <UserItem fullName={'Stepa Stepan dsa dsdasdasd'} job={'Главный технолог'} />
-          <UserItem fullName={'Stepa Stepan'} job={'Главный технологdddddddddd'} />
-          <UserItem fullName={'Stepa Stepan'} job={'Главный технолог'} />
-          <UserItem fullName={'Stepa Stepan'} job={'Главный технолог'} />
+          <UserItem
+            fullName={'Stepa Stepan dsa dsdasdasd'}
+            job={'Главный технолог'}
+            href={routes.adminUserManage.create('1')}
+          />
+          <UserItem
+            fullName={'Ivan Ivanov'}
+            job={'Инженер'}
+            href={routes.adminUserManage.create('2')}
+          />
         </section>
 
         <div className={layoutStyles.bottomContainer}>
@@ -41,6 +49,6 @@ function UsersListPage() {
       </div>
     </>
   );
-}
+});
 
 export default UsersListPage;

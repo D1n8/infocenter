@@ -20,8 +20,8 @@ export const routes = {
     create: () => '/settings/users-list',
   },
   adminUserManage: {
-    mask: 'user-manage',
-    create: () => 'settings/user-manage',
+    mask: 'user-manage/:id',
+    create: (id: string) => `/settings/user-manage/${id}`,
   },
   chartListSettings: {
     mask: '/operational-management/chart-list-settings/:sectionId',

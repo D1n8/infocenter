@@ -7,6 +7,7 @@ import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import UserManagePage from 'App/pages/UserManagePage';
 import UsersListPage from 'App/pages/UsersListPage';
 import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
 import { Navigate, type RouteObject } from 'react-router-dom';
@@ -33,6 +34,10 @@ export const routesConfig: RouteObject[] = [
                 path: routes.adminUsersList.mask,
                 element: <UsersListPage />,
               },
+              {
+                path: routes.adminUserManage.mask,
+                element: <UserManagePage />,
+              },
             ],
           },
           {
@@ -44,7 +49,7 @@ export const routesConfig: RouteObject[] = [
             children: [
               {
                 index: true,
-                element: <Navigate to={routes.operationalManagement.mask} replace />,
+                element: <Navigate to={routes.operationalManagement.create()} replace />,
               },
               {
                 path: routes.operationalManagement.mask,
@@ -62,7 +67,7 @@ export const routesConfig: RouteObject[] = [
           },
           {
             path: '*',
-            element: <Navigate to={routes.operationalManagement.mask} replace />,
+            element: <Navigate to={routes.operationalManagement.create()} replace />,
           },
         ],
       },
@@ -79,6 +84,6 @@ export const routesConfig: RouteObject[] = [
   },
   {
     path: '*',
-    element: <Navigate to={routes.auth.mask} replace />,
+    element: <Navigate to={routes.auth.create()} replace />,
   },
 ];
