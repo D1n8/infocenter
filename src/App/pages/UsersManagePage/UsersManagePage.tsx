@@ -23,7 +23,10 @@ function UserManagePage() {
           <Button>Добавить пользователя</Button>
         </div>
         <section className={classNames(styles.usersList, layoutStyles.settingsMenu)}>
-          <UserItem>Степа Степка</UserItem>
+          <UserItem fullName={'Stepa Stepan dsa dsdasdasd'} job={'Главный технолог'} />
+          <UserItem fullName={'Stepa Stepan'} job={'Главный технологdddddddddd'} />
+          <UserItem fullName={'Stepa Stepan'} job={'Главный технолог'} />
+          <UserItem fullName={'Stepa Stepan'} job={'Главный технолог'} />
         </section>
       </div>
     </div>

@@ -4,14 +4,18 @@ import { Link } from 'react-router-dom';
 import styles from './UserItem.module.scss';
 
 type UserPageType = {
-  children: React.ReactNode;
+  fullName: string;
+  job?: string;
   href?: string;
 };
 
-function UserItem({ children, href = '#' }: UserPageType) {
+function UserItem({ fullName, job, href = '#' }: UserPageType) {
   return (
     <Link className={styles.userItem} to={href}>
-      <span className={styles.text}>{children}</span>
+      <div className={styles.content}>
+        <p className={styles.text}>{fullName}</p>
+        <p className={styles.job}>{job}</p>
+      </div>
       <Chevron />
     </Link>
   );

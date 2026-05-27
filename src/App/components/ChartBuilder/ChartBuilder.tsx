@@ -4,6 +4,7 @@ import ReactECharts from 'echarts-for-react';
 import React, { useState, useMemo } from 'react';
 import { DataGrid } from 'react-data-grid';
 import { useNavigate } from 'react-router';
+import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
 import { parseClipboardData } from 'utils/clipboard';
@@ -159,9 +160,9 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
         </button>
       </div>
 
-      <div className={styles.bottomContainer}>
-        <div className={styles.btnContainer}>
-          <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
+      <div className={layoutStyles.bottomContainer}>
+        <div className={layoutStyles.btnContainer}>
+          <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
             Отменить
           </Button>
           <Button>Сохранить</Button>

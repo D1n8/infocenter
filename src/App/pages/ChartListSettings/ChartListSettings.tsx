@@ -4,6 +4,7 @@ import BackButton from 'components/IconButtons/BackButton';
 import { routes } from 'config/routes';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import layoutStyles from 'styles/shared/Layout.module.scss';
 
 import { sectionsData } from '../OperationalManagement/Sections/mockData';
 
@@ -20,16 +21,16 @@ function ChartListSettings() {
   return (
     <div className={styles.chartListSettings}>
       <div className={styles.topContainer}>
-        <div className={styles.titleContainer}>
+        <div className={layoutStyles.titleContainer}>
           <BackButton onClick={() => navigate(-1)}>Назад</BackButton>
-          <h2 className={styles.title}>{currentSection.title}</h2>
+          <h2 className={layoutStyles.title}>{currentSection.title}</h2>
         </div>
         <Button onClick={() => navigate(routes.chartBuilder.create())}>Добавить график</Button>
       </div>
       <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
-      <div className={styles.bottomContainer}>
-        <div className={styles.btnContainer}>
-          <Button className={styles.cancelBtn} onClick={() => navigate(-1)}>
+      <div className={layoutStyles.bottomContainer}>
+        <div className={layoutStyles.btnContainer}>
+          <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
             Отменить
           </Button>
           <Button>Сохранить</Button>

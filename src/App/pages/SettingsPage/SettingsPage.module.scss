@@ -1,20 +1,3 @@
 .settingsList {
   height: 600px;
 }
-
-.bottomContainer {
-  display: flex;
-  justify-content: end;
-}
-
-.btnContainer {
-  display: flex;
-  gap: 40px;
-  align-items: end;
-}
-
-.cancelBtn {
-  background-color: transparent;
-  color: var(--main-text);
-  border: 1px solid #e5e5e5;
-}
