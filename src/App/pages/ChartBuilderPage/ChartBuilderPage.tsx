@@ -8,13 +8,13 @@ function ChartBuilerPage() {
   const navigate = useNavigate();
   const { columns, rows } = generateEmptyGrid(3, 5);
   return (
-    <div>
+    <>
       <div className={layoutStyles.titleContainer}>
         <BackButton onClick={() => navigate(-1)} />
         <h2 className={layoutStyles.title}>Добавление графика</h2>
       </div>
       <ChartBuilder initialColumns={columns} initialRows={rows} />
-    </div>
+    </>
   );
 }
 

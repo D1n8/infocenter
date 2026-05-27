@@ -12,7 +12,7 @@ import SettingsItem from './components/SettingsItem';
 function SettingsPage() {
   const navigate = useNavigate();
   return (
-    <div>
+    <>
       <div className={layoutStyles.titleContainer}>
         <BackButton onClick={() => navigate(-1)} />
         <h2 className={layoutStyles.title}>Настройки</h2>
@@ -27,14 +27,14 @@ function SettingsPage() {
         <section className={classNames(styles.settingsList, layoutStyles.settingsMenu)}>
           <SettingsItem>Пользовательские настройки</SettingsItem>
           <SettingsItem>Предприятия</SettingsItem>
-          <SettingsItem href={routes.adminUsersManage.create()}>
+          <SettingsItem href={routes.adminUsersList.create()}>
             Управление пользователями
           </SettingsItem>
           <SettingsItem>Управление ролями</SettingsItem>
           <SettingsItem>Системные настройки</SettingsItem>
         </section>
       </div>
-    </div>
+    </>
   );
 }
 

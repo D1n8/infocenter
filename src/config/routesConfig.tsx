@@ -7,7 +7,7 @@ import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
-import UsersManagePage from 'App/pages/UsersManagePage';
+import UsersListPage from 'App/pages/UsersListPage';
 import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
@@ -30,8 +30,8 @@ export const routesConfig: RouteObject[] = [
                 element: <SettingsPage />,
               },
               {
-                path: routes.adminUsersManage.mask,
-                element: <UsersManagePage />,
+                path: routes.adminUsersList.mask,
+                element: <UsersListPage />,
               },
             ],
           },

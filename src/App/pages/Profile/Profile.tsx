@@ -7,12 +7,10 @@ function Profile() {
   const { userStore } = useRootStore();
   const navigate = useNavigate();
   return (
-    <div>
-      <div className={layoutStyles.titleContainer}>
-        <BackButton onClick={() => navigate(-1)} />
-        <h2 className={layoutStyles.title}>Профиль</h2>
-        <p>{userStore.user?.fullName}</p>
-      </div>
+    <div className={layoutStyles.titleContainer}>
+      <BackButton onClick={() => navigate(-1)} />
+      <h2 className={layoutStyles.title}>Профиль</h2>
+      <p>{userStore.user?.fullName}</p>
     </div>
   );
 }
