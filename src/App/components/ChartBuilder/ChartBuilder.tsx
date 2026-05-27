@@ -1,9 +1,12 @@
 import Button from 'components/Button';
 import { CHART_SCHEMAS } from 'config/chartSchemas';
 import ReactECharts from 'echarts-for-react';
-import React, { useState, useMemo } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DataGrid } from 'react-data-grid';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
+import { diagramStore } from 'store/DiagramStore';
+import { userStore } from 'store/UserStore';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
@@ -17,17 +20,24 @@ import 'react-data-grid/lib/styles.css';
 import styles from './ChartBuilder.module.scss';
 import ChartConfigMenu from './components/ChartConfigMenu';
 
+const SECTION_COLORS: Record<string, string> = {
+  production: '#FADB14',
+  economy: '#52C41A',
+  safety: '#FF4D4F',
+  quality: '#002766',
+  culture: '#40A9FF',
+};
+
 type ChartBuilderProps = {
   initialColumns?: BaseColumn[];
   initialRows?: RowData[];
 };
 
-function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderProps) {
+const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartBuilderProps) => {
   const [columns, setColumns] = useState<BaseColumn[]>(initialColumns);
   const [rows, setRows] = useState<RowData[]>(initialRows);
 
-  const navigate = useNavigate();
-
+  // ВОТ ЭТОТ БЛОК БЫЛ СЛУЧАЙНО УДАЛЕН В ПРОШЛОМ ОТВЕТЕ
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
     title: { text: 'Новый график' },
     chartType: 'bar',
@@ -36,6 +46,19 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
       yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
     },
   });
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const stateContext = location.state as { block?: string; unitId?: string } | null;
+  const currentBlock = stateContext?.block || 'production';
+  const currentUnitId = stateContext?.unitId || '';
+
+  useEffect(() => {
+    if (userStore.unitsTree.length === 0) {
+      userStore.fetchUnitsTree();
+    }
+  }, []);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const clipboardData = e.clipboardData.getData('Text');
@@ -91,6 +114,60 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
     setRows((prev) => [...prev, newRow]);
   };
 
+  const handleSave = async () => {
+    if (columns.length === 0 || rows.length === 0) return;
+
+    const fallbackUnitId = userStore.unitsTree[0]?.id || '';
+    const targetUnitId =
+      currentUnitId && currentUnitId !== '00000000-0000-0000-0000-000000000000'
+        ? currentUnitId
+        : fallbackUnitId;
+
+    if (!targetUnitId) {
+      return;
+    }
+
+    const columnsWithTypes = columns.map((col) => {
+      const firstVal = rows[0]?.[col.key];
+      let colType: 'string' | 'number' | 'date' = 'string';
+
+      if (firstVal !== undefined && firstVal !== null && firstVal !== '') {
+        const normalizedVal = String(firstVal).replace(',', '.').trim();
+        if (!isNaN(Number(normalizedVal))) {
+          colType = 'number';
+        }
+      }
+
+      return {
+        key: col.key,
+        name: col.name || 'Без названия',
+        type: colType,
+      };
+    });
+
+    const diagram = await diagramStore.createDiagram({
+      block: currentBlock as any,
+      unit_id: targetUnitId,
+      columns: columnsWithTypes,
+      rows,
+    });
+
+    if (diagram) {
+      await diagramStore.createChart({
+        diagramId: diagram.id, // Изменено на diagramId
+        title: chartConfig.title.text,
+        chartType: chartConfig.chartType, // Изменено на chartType
+        mapping: chartConfig.mapping,
+        uiConfig: {
+          // Изменено на uiConfig
+          ...chartConfig.uiConfig,
+          color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
+        },
+      });
+      navigate(-1);
+    }
+  };
+
   const gridColumns: CustomColumn[] = [
     ...columns.map((col) => ({
       ...col,
@@ -113,8 +190,15 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
   ];
 
   const chartOption = useMemo(() => {
-    return transformDataForECharts(rows, chartConfig);
-  }, [rows, chartConfig]);
+    const configWithColor: ChartConfig = {
+      ...chartConfig,
+      uiConfig: {
+        ...chartConfig.uiConfig,
+        color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
+      },
+    };
+    return transformDataForECharts(rows, configWithColor);
+  }, [rows, chartConfig, currentBlock]);
 
   const isChartReady = useMemo(() => {
     const currentSchema = CHART_SCHEMAS[chartConfig.chartType] || [];
@@ -133,7 +217,7 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
 
       <div className={styles.chartContainer}>
         {isChartReady ? (
-          <ReactECharts option={chartOption} style={{ height: '100%' }} />
+          <ReactECharts option={chartOption} style={{ height: '100%' }} notMerge={true} />
         ) : (
           <p className={styles.chartInfo}>Выберите все обязательные оси для построения графика</p>
         )}
@@ -165,11 +249,13 @@ function ChartBuilder({ initialColumns = [], initialRows = [] }: ChartBuilderPro
           <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
             Отменить
           </Button>
-          <Button>Сохранить</Button>
+          <Button onClick={handleSave} disabled={diagramStore.isLoading}>
+            {diagramStore.isLoading ? 'Сохранение...' : 'Сохранить'}
+          </Button>
         </div>
       </div>
     </div>
   );
-}
+});
 
 export default ChartBuilder;

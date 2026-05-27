@@ -5,8 +5,11 @@ import Dropdown from 'components/Dropdown';
 import type { DropdownOption } from 'components/Dropdown/Dropdown';
 import MaximizeButton from 'components/IconButtons/MaximizeButton';
 import MinimizeButton from 'components/IconButtons/MinimizeButton';
-import { useEffect, useState } from 'react';
-import type { SectionType } from 'types/index';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState, useMemo } from 'react';
+import { diagramStore } from 'store/DiagramStore';
+import type { CardType, BlockType } from 'types/index';
 
 import styles from './Section.module.scss';
 
@@ -17,7 +20,23 @@ const LIMIT_OPTIONS: DropdownOption[] = [
   { value: 'all', label: 'Показать все графики' },
 ];
 
-function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }: SectionType) {
+const SECTION_COLORS: Record<string, string> = {
+  production: '#FADB14',
+  economy: '#52C41A',
+  safety: '#FF4D4F',
+  quality: '#002766',
+  culture: '#40A9FF',
+};
+
+interface SectionProps {
+  isMaximize: boolean;
+  setIsMaximize: (flag: boolean) => void;
+  title: string;
+  blockId: BlockType;
+  onClick: () => void;
+}
+
+const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }: SectionProps) => {
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
   const [limit, setLimit] = useState<string>('6');
 
@@ -32,6 +51,33 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
       setLimit('6');
     }
   }, [isMaximize]);
+
+  const cards: CardType[] = useMemo(() => {
+    const rawCharts = toJS(diagramStore.charts);
+    const rawDiagrams = toJS(diagramStore.diagrams);
+
+    return rawCharts
+      .filter((chart) => rawDiagrams.some((d) => d.id === chart.diagramId && d.block === blockId))
+      .map((chart) => {
+        const diagram = rawDiagrams.find((d) => d.id === chart.diagramId);
+        return {
+          id: chart.id,
+          diagramId: chart.diagramId,
+          order: diagram ? (diagram.order ?? 0) : 0, // Читаем order с бэка
+          data: diagram ? diagram.rows : [],
+          config: {
+            title: { text: chart.title },
+            chartType: chart.chartType,
+            mapping: chart.mapping,
+            uiConfig: {
+              ...chart.uiConfig,
+              color: chart.uiConfig?.color || SECTION_COLORS[blockId],
+            },
+          },
+        };
+      })
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)); // Сортируем по возрастанию order
+  }, [diagramStore.charts, diagramStore.diagrams, blockId]);
 
   const handleLimitChange = (opt: DropdownOption) => {
     setLimit(String(opt.value));
@@ -65,9 +111,9 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
         </div>
         <Button onClick={onClick} children={'Настроить графики'} />
       </div>
-      <ChartList isMaximize={isMaximize} cards={cards} setCards={setCards} limit={limit} />
+      <ChartList isMaximize={isMaximize} cards={cards} setCards={() => {}} limit={limit} />
     </section>
   );
-}
+});
 
 export default Section;

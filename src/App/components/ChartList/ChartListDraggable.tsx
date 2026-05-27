@@ -16,7 +16,7 @@ import ChartCardDraggable from '../ChartCard/ChartCardDraggable';
 
 import styles from './ChartList.module.scss';
 
-function ChartList({ isMaximize, cards, setCards }: ChartListType) {
+function ChartListDraggable({ isMaximize, cards, setCards }: ChartListType) {
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
 
   useEffect(() => {
@@ -66,4 +66,4 @@ function ChartList({ isMaximize, cards, setCards }: ChartListType) {
   );
 }
 
-export default ChartList;
+export default ChartListDraggable;

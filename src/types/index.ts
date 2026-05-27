@@ -36,6 +36,7 @@ export type ChartConfig = {
 export type BaseColumn = {
   key: string;
   name: string;
+  type?: 'string' | 'number' | 'date';
 };
 
 export type CustomColumn = Column<RowData> & {
@@ -46,6 +47,8 @@ export type CustomColumn = Column<RowData> & {
 
 export type CardType = {
   id: number;
+  diagramId?: string;
+  order?: number;
   data: RowData[];
   config: ChartConfig;
   isHidden?: boolean;
