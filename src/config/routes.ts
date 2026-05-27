@@ -7,6 +7,10 @@ export const routes = {
     mask: 'auth',
     create: () => '/auth',
   },
+  profile: {
+    mask: 'profile',
+    create: () => '/profile',
+  },
   settings: {
     mask: 'settings',
     create: () => '/settings',

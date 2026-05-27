@@ -4,6 +4,7 @@ import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
 import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
+import Profile from 'App/pages/Profile';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
@@ -17,6 +18,10 @@ export const routesConfig: RouteObject[] = [
       {
         path: routes.settings.mask,
         element: <SettingsPage />,
+      },
+      {
+        path: routes.profile.mask,
+        element: <Profile />,
       },
       {
         element: <Main />,

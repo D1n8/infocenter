@@ -16,7 +16,9 @@ function Header() {
         <Link to={routes.settings.create()}>
           <Settings />
         </Link>
-        <UserIcon />
+        <Link to={routes.profile.create()}>
+          <UserIcon />
+        </Link>
       </nav>
     </header>
   );

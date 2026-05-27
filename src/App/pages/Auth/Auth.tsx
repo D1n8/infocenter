@@ -1,11 +1,22 @@
 import Button from 'components/Button';
 import LogoIcon from 'components/Icons/Logo';
 import Input from 'components/Input';
+import { useState } from 'react';
+import { useRootStore } from 'store/RootStore/RootStore';
 
 import styles from './Auth.module.scss';
 import img from './assets/Image.png';
 
 function AuthPage() {
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const { userStore } = useRootStore();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    userStore.loginUser(login, password);
+  };
+
   return (
     <main className={styles.authMain}>
       <section className={styles.formSection}>
@@ -13,10 +24,20 @@ function AuthPage() {
           <div className={styles.logoBg}>
             <LogoIcon width={171} height={43} />
           </div>
-          <form className={styles.authForm}>
-            <Input placeholder="Введите логин" />
-            <Input placeholder="Введите пароль" />
-            <Button className={styles.authBtn}>Войти</Button>
+          <form className={styles.authForm} onSubmit={handleSubmit}>
+            <Input
+              placeholder="Введите логин"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+            <Input
+              placeholder="Введите пароль"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button className={styles.authBtn} type="submit">
+              Войти
+            </Button>
           </form>
         </div>
       </section>
