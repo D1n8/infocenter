@@ -1,3 +1,4 @@
+import Button from 'components/Button';
 import PageTitle from 'components/PageTitle';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
@@ -77,6 +78,20 @@ const Profile = observer(() => {
               {user.role === 'admin' ? 'Администратор' : 'Пользователь'}
             </span>
           </div>
+
+          <Button
+            onClick={() => userStore.logout()}
+            style={{
+              marginTop: '12px',
+              alignSelf: 'flex-start',
+              backgroundColor: '#ff4d4f',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Выйти из аккаунта
+          </Button>
         </div>
       </div>
     </>
