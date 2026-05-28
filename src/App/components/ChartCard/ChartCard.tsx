@@ -1,11 +1,7 @@
 import { transformDataForECharts } from 'App/utils/chartTransformer';
 import classNames from 'classnames';
 import MoreVertButton from 'components/IconButtons/MoreVertButton';
-import Delete from 'components/Icons/Delete';
-import Edit from 'components/Icons/Edit';
 import FullScreen from 'components/Icons/FullScreen';
-import Table from 'components/Icons/Table';
-import Upload from 'components/Icons/Upload';
 import Modal from 'components/Modal';
 import PopupMenu from 'components/PopupMenu';
 import PopupMenuBtn from 'components/PopupMenuBtn';
@@ -19,6 +15,7 @@ export type ChartCardType = {
   data: RowData[];
   config: ChartConfig;
   id: number;
+  diagramId?: string;
   isHidden?: boolean;
 };
 
@@ -60,21 +57,21 @@ function ChartCard({ data, config, isHidden = false }: ChartCardType) {
           {menuIsOpen && (
             <PopupMenu>
               <PopupMenuBtn
-                onClick={() => setFullScreenIsOpen(true)}
+                onClick={() => {
+                  setFullScreenIsOpen(true);
+                  setMenuIsOpen(false);
+                }}
                 icon={<FullScreen />}
                 text="Показать во весь экран"
               />
-              <PopupMenuBtn icon={<Table />} text="Открыть таблицу" />
-              <PopupMenuBtn icon={<Upload />} text="Экспортировать" />
-              <PopupMenuBtn icon={<Edit />} text="Изменить" />
-              <PopupMenuBtn icon={<Delete />} text="Удалить" />
             </PopupMenu>
           )}
         </div>
-        <ReactECharts option={chartOption} />
+        <ReactECharts option={chartOption} notMerge={true} />
       </article>
+
       <Modal isOpen={fullScreenIsOpen} onClose={() => setFullScreenIsOpen(false)}>
-        <ReactECharts option={chartOption} style={{ height: '100%' }} />
+        <ReactECharts option={chartOption} style={{ height: '100%' }} notMerge={true} />
       </Modal>
     </>
   );

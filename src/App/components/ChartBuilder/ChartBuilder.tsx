@@ -1,12 +1,13 @@
 import Button from 'components/Button';
 import { CHART_SCHEMAS } from 'config/chartSchemas';
 import ReactECharts from 'echarts-for-react';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useState, useMemo, useEffect } from 'react';
 import { DataGrid } from 'react-data-grid';
 import { useNavigate, useLocation } from 'react-router';
 import { diagramStore } from 'store/DiagramStore';
-import { useRootStore } from 'store/RootStore/RootStore'; // Импортируем хук
+import { useRootStore } from 'store/RootStore/RootStore';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
@@ -34,22 +35,80 @@ type ChartBuilderProps = {
 };
 
 const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartBuilderProps) => {
-  const { userStore } = useRootStore(); // Получаем правильный стор из контекста
-  const [columns, setColumns] = useState<BaseColumn[]>((columns) => initialColumns);
-  const [rows, setRows] = useState<RowData[]>((rows) => initialRows);
+  const { userStore } = useRootStore();
+  const [columns, setColumns] = useState<BaseColumn[]>(initialColumns);
+  const [rows, setRows] = useState<RowData[]>(initialRows);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const stateContext = location.state as { block?: string; unitId?: string } | null;
+  const stateContext = location.state as {
+    block?: string;
+    unitId?: string;
+    isEditing?: boolean;
+    chartId?: number;
+    diagramId?: string;
+  } | null;
+
   const currentBlock = stateContext?.block || 'production';
   const currentUnitId = stateContext?.unitId || '';
+
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    title: { text: 'Новый график' },
+    chartType: 'bar',
+    mapping: {
+      xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
+      yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
+    },
+  });
 
   useEffect(() => {
     if (userStore.user?.role === 'admin' && userStore.unitsTree.length === 0) {
       userStore.fetchUnitsTree();
     }
-  }, [userStore]);
+
+    const loadEditData = async () => {
+      if (stateContext?.isEditing && stateContext.diagramId && stateContext.chartId) {
+        let rawDiagrams = toJS(diagramStore.diagrams);
+        let rawCharts = toJS(diagramStore.charts);
+
+        let diagram = rawDiagrams.find((d) => d.id === stateContext.diagramId);
+        let chart = rawCharts.find((c) => c.id === stateContext.chartId);
+
+        if (!diagram || !chart) {
+          await Promise.all([
+            diagramStore.fetchDiagramById(stateContext.diagramId),
+            diagramStore.fetchCharts(stateContext.diagramId),
+          ]);
+
+          rawDiagrams = toJS(diagramStore.diagrams);
+          rawCharts = toJS(diagramStore.charts);
+
+          diagram = toJS(diagramStore.currentDiagram) || undefined;
+          chart = rawCharts.find((c) => c.id === stateContext.chartId);
+        }
+
+        if (diagram && chart) {
+          const restoredColumns: BaseColumn[] = diagram.columns.map((col, index) => ({
+            key: col.key || `col_${index + 1}`,
+            name: col.name,
+            type: col.type,
+          }));
+
+          setColumns(restoredColumns);
+          setRows(diagram.rows);
+          setChartConfig({
+            title: { text: chart.title },
+            chartType: chart.chartType,
+            mapping: chart.mapping,
+            uiConfig: chart.uiConfig,
+          });
+        }
+      }
+    };
+
+    loadEditData();
+  }, [stateContext, userStore]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const clipboardData = e.clipboardData.getData('Text');
@@ -89,7 +148,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
 
   const addColumn = () => {
     const newKey = `col_${Date.now()}`;
-    setColumns((prev) => [...prev, { key: newKey, name: '' }]);
+    setColumns((prev) => [...prev, { key: newKey, name: '', type: 'string' }]);
     setRows((prev) => prev.map((r) => ({ ...r, [newKey]: '' })));
   };
 
@@ -106,9 +165,20 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
   };
 
   const handleSave = async () => {
-    if (columns.length === 0 || rows.length === 0) return;
+    if (columns.length === 0 || rows.length === 0) {
+      console.warn('Сохранение прервано: пустая таблица (нет строк или колонок)');
+      return;
+    }
 
     const findPermittedUnitId = () => {
+      if (stateContext?.isEditing && stateContext.diagramId) {
+        const rawDiagrams = toJS(diagramStore.diagrams);
+        const originalDiag = rawDiagrams.find((d) => d.id === stateContext.diagramId);
+        if (originalDiag) {
+          return originalDiag.unit_id;
+        }
+      }
+
       if (userStore.user?.role === 'admin') {
         return userStore.unitsTree[0]?.id || '';
       }
@@ -126,10 +196,13 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
         : findPermittedUnitId();
 
     if (!targetUnitId) {
+      console.warn(
+        'Сохранение прервано: не удалось определить разрешенный unit_id для пользователя'
+      );
       return;
     }
 
-    const columnsWithTypes = columns.map((col) => {
+    const columnsWithTypes = columns.map((col, index) => {
       const firstVal = rows[0]?.[col.key];
       let colType: 'string' | 'number' | 'date' = 'string';
 
@@ -141,42 +214,63 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
       }
 
       return {
-        key: col.key,
+        key: `col_${index + 1}`,
         name: col.name || 'Без названия',
         type: colType,
       };
     });
 
-    const diagram = await diagramStore.createDiagram({
+    const normalizedRows = rows.map((row) => {
+      const rowObject: RowData = {};
+      columns.forEach((col, index) => {
+        rowObject[`col_${index + 1}`] = row[col.key] || '';
+      });
+      return rowObject;
+    });
+
+    const normalizedMapping: Record<string, string> = {};
+    for (const mapKey in chartConfig.mapping) {
+      const oldKey = chartConfig.mapping[mapKey];
+      const colIndex = columns.findIndex((c) => c.key === oldKey);
+      if (colIndex !== -1) {
+        normalizedMapping[mapKey] = `col_${colIndex + 1}`;
+      } else {
+        normalizedMapping[mapKey] = '';
+      }
+    }
+
+    const payloadDiagram = {
       block: currentBlock as any,
       unit_id: targetUnitId,
       columns: columnsWithTypes,
-      rows,
-    });
+      rows: normalizedRows,
+    };
 
-    if (diagram) {
-      await diagramStore.createChart({
-        diagramId: diagram.id,
-        title: chartConfig.title.text,
-        chartType: chartConfig.chartType,
-        mapping: chartConfig.mapping,
-        uiConfig: {
-          ...chartConfig.uiConfig,
-          color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
-        },
-      });
-      navigate(-1);
+    const payloadChart = {
+      title: chartConfig.title.text,
+      chartType: chartConfig.chartType,
+      mapping: normalizedMapping,
+      uiConfig: {
+        ...chartConfig.uiConfig,
+        color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
+      },
+    };
+
+    if (stateContext?.isEditing && stateContext.diagramId && stateContext.chartId) {
+      await diagramStore.updateDiagram(stateContext.diagramId, payloadDiagram);
+      await diagramStore.updateChart(stateContext.chartId, payloadChart);
+    } else {
+      const diagram = await diagramStore.createDiagram(payloadDiagram);
+      if (diagram) {
+        await diagramStore.createChart({
+          diagramId: diagram.id,
+          ...payloadChart,
+        });
+      }
     }
-  };
 
-  const [chartConfig, setChartConfig] = useState<ChartConfig>({
-    title: { text: 'Новый график' },
-    chartType: 'bar',
-    mapping: {
-      xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
-      yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
-    },
-  });
+    navigate(-1);
+  };
 
   const gridColumns: CustomColumn[] = [
     ...columns.map((col) => ({

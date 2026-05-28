@@ -55,6 +55,7 @@ function ChartListDraggable({ isMaximize, cards, setCards }: ChartListType) {
               <ChartCardDraggable
                 key={card.id}
                 id={card.id}
+                diagramId={card.diagramId}
                 data={card.data}
                 config={card.config}
               />
