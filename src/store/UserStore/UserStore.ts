@@ -3,8 +3,9 @@ import { computed, makeObservable, observable, runInAction } from 'mobx';
 import type {
   UserPermissionsType,
   UserPermissionsRequestType,
-  PermissionGrantType,
   UnitTreeItem,
+  BlockType,
+  ActionType,
 } from 'types/index';
 
 import {
@@ -21,7 +22,8 @@ type PrivateFields =
   | '_managedUser'
   | '_managedPermissions'
   | '_usersList'
-  | '_unitsTree';
+  | '_unitsTree'
+  | '_myPermissions';
 
 export default class UserStore {
   private _error = '';
@@ -34,6 +36,8 @@ export default class UserStore {
   private _managedUser: UserTypeModel | null = null;
   private _managedPermissions: UserPermissionsType | null = null;
 
+  private _myPermissions: UserPermissionsType = [];
+
   constructor() {
     makeObservable<UserStore, PrivateFields>(this, {
       _error: observable,
@@ -43,6 +47,7 @@ export default class UserStore {
       _unitsTree: observable,
       _managedUser: observable,
       _managedPermissions: observable,
+      _myPermissions: observable,
 
       isAuth: computed,
       error: computed,
@@ -52,6 +57,8 @@ export default class UserStore {
       managedPermissions: computed,
       usersList: computed,
       unitsTree: computed,
+      myPermissions: computed,
+      canManagePermissions: computed,
     });
   }
 
@@ -87,6 +94,34 @@ export default class UserStore {
     return this._unitsTree;
   }
 
+  get myPermissions(): UserPermissionsType {
+    return this._myPermissions;
+  }
+
+  get canManagePermissions(): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some((p) => p.action === 'manage_permissions');
+  }
+
+  hasBlockAccess(block: BlockType, action: ActionType = 'view'): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some(
+      (p) =>
+        (p.block === block || p.block === 'all') &&
+        (p.action === action || p.action === 'manage' || p.action === 'manage_permissions')
+    );
+  }
+
+  canManageBlock(block: BlockType): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some(
+      (p) => (p.block === block || p.block === 'all') && p.action === 'manage'
+    );
+  }
+
   async loginUser(login: string, password: string) {
     this._error = '';
     this._isLoading = true;
@@ -101,9 +136,13 @@ export default class UserStore {
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
       const userResponse = await api.get('/users/me');
+      const permsResponse = await api.get<UserPermissionsType>(
+        `/permissions/users/${userResponse.data.id}`
+      );
 
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
+        this._myPermissions = permsResponse.data;
       });
     } catch {
       runInAction(() => {
@@ -125,8 +164,13 @@ export default class UserStore {
 
     try {
       const userResponse = await api.get('/users/me');
+      const permsResponse = await api.get<UserPermissionsType>(
+        `/permissions/users/${userResponse.data.id}`
+      );
+
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
+        this._myPermissions = permsResponse.data;
       });
     } catch {
       this.logout();
@@ -142,6 +186,7 @@ export default class UserStore {
     localStorage.removeItem('refresh_token');
     runInAction(() => {
       this._user = null;
+      this._myPermissions = [];
     });
   }
 
@@ -205,6 +250,32 @@ export default class UserStore {
     }
   }
 
+  async updateUser(userId: string, data: Partial<CreateUserType>) {
+    this._isLoading = true;
+    this._error = '';
+    try {
+      const response = await api.patch<UserTypeApi>(`/users/${userId}`, {
+        login: data.login,
+        full_name: data.full_name,
+        role: data.role,
+        job_title: data.job_title,
+        email: data.email,
+        is_active: data.is_active,
+      });
+      runInAction(() => {
+        this._managedUser = normalizeUserType(response.data);
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось обновить данные пользователя';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
   async fetchUsersList() {
     this._usersList = [];
     try {
@@ -259,7 +330,7 @@ export default class UserStore {
     }
   }
 
-  async revokePermissions(userId: string, payload: PermissionGrantType[]) {
+  async revokePermissions(userId: string, payload: UserPermissionsRequestType) {
     this._isLoading = true;
     this._error = '';
 

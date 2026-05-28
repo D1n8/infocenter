@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Section from '../Section';
 import 'react-data-grid/lib/styles.css';
 
-function CorporateCulture() {
+function Culture() {
   const [isMaximize, setIsMaximize] = useState(false);
   const navigate = useNavigate();
 
@@ -20,4 +20,4 @@ function CorporateCulture() {
   );
 }
 
-export default CorporateCulture;
+export default Culture;

@@ -89,14 +89,21 @@ const UserManagePage = observer(() => {
         )
     );
 
-    const promises: Promise<void>[] = [];
+    const promises: Promise<void | null>[] = [
+      userStore.updateUser(id, {
+        login: formData.login,
+        email: formData.email,
+        full_name: formData.fullName,
+        job_title: formData.jobTitle,
+      }),
+    ];
 
     if (toGrant.length > 0) {
       promises.push(userStore.grantPermissions(id, { permissions: toGrant }));
     }
 
     if (toRevoke.length > 0) {
-      promises.push(userStore.revokePermissions(id, toRevoke));
+      promises.push(userStore.revokePermissions(id, { permissions: toRevoke }));
     }
 
     await Promise.all(promises);

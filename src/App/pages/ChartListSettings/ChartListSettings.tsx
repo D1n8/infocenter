@@ -2,10 +2,10 @@ import ChartListDraggable from 'App/components/ChartList/ChartListDraggable';
 import Button from 'components/Button';
 import BackButton from 'components/IconButtons/BackButton';
 import { routes } from 'config/routes';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
 import { diagramStore } from 'store/DiagramStore';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { CardType } from 'types/index';
@@ -28,8 +28,7 @@ const ChartListSettings = observer(() => {
   const [cards, setCards] = useState<CardType[]>([]);
 
   useEffect(() => {
-    diagramStore.fetchDiagrams(0, 100, block as any);
-    diagramStore.fetchCharts();
+    diagramStore.fetchDashboardData(block as any);
   }, [block]);
 
   useEffect(() => {

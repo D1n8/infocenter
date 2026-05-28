@@ -94,6 +94,36 @@ export default class DiagramStore {
     }
   }
 
+  async fetchDashboardData(block?: BlockType | null) {
+    this._isLoading = true;
+    this._error = '';
+    try {
+      const [diagramsResponse, chartsResponse] = await Promise.all([
+        api.get<DatasetResponse[]>('/diagrams/', {
+          params: {
+            skip: 0,
+            limit: 100,
+            block: block || undefined,
+          },
+        }),
+        api.get<ChartResponse[]>('/charts/'),
+      ]);
+
+      runInAction(() => {
+        this._diagrams = diagramsResponse.data;
+        this._charts = chartsResponse.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось загрузить данные дашборда';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
   async createDiagram(data: DatasetCreate): Promise<DatasetResponse | null> {
     this._isLoading = true;
     this._error = '';

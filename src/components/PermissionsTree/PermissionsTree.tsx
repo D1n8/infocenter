@@ -21,7 +21,6 @@ const BLOCKS: { value: BlockType | 'all'; label: string }[] = [
 const ACTIONS: { value: ActionType; label: string }[] = [
   { value: 'view', label: 'Просмотр' },
   { value: 'manage', label: 'Управление' },
-  { value: 'manage_permissions', label: 'Управление правами' },
 ];
 
 function TreeNode({

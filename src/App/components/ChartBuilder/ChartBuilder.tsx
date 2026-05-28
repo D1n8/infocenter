@@ -6,7 +6,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { DataGrid } from 'react-data-grid';
 import { useNavigate, useLocation } from 'react-router';
 import { diagramStore } from 'store/DiagramStore';
-import { userStore } from 'store/UserStore';
+import { useRootStore } from 'store/RootStore/RootStore'; // Импортируем хук
 import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
@@ -34,18 +34,9 @@ type ChartBuilderProps = {
 };
 
 const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartBuilderProps) => {
-  const [columns, setColumns] = useState<BaseColumn[]>(initialColumns);
-  const [rows, setRows] = useState<RowData[]>(initialRows);
-
-  // ВОТ ЭТОТ БЛОК БЫЛ СЛУЧАЙНО УДАЛЕН В ПРОШЛОМ ОТВЕТЕ
-  const [chartConfig, setChartConfig] = useState<ChartConfig>({
-    title: { text: 'Новый график' },
-    chartType: 'bar',
-    mapping: {
-      xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
-      yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
-    },
-  });
+  const { userStore } = useRootStore(); // Получаем правильный стор из контекста
+  const [columns, setColumns] = useState<BaseColumn[]>((columns) => initialColumns);
+  const [rows, setRows] = useState<RowData[]>((rows) => initialRows);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,10 +46,10 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
   const currentUnitId = stateContext?.unitId || '';
 
   useEffect(() => {
-    if (userStore.unitsTree.length === 0) {
+    if (userStore.user?.role === 'admin' && userStore.unitsTree.length === 0) {
       userStore.fetchUnitsTree();
     }
-  }, []);
+  }, [userStore]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const clipboardData = e.clipboardData.getData('Text');
@@ -117,11 +108,22 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
   const handleSave = async () => {
     if (columns.length === 0 || rows.length === 0) return;
 
-    const fallbackUnitId = userStore.unitsTree[0]?.id || '';
+    const findPermittedUnitId = () => {
+      if (userStore.user?.role === 'admin') {
+        return userStore.unitsTree[0]?.id || '';
+      }
+      const matchedPermission = userStore.myPermissions.find(
+        (p) =>
+          (p.block === currentBlock || p.block === 'all') &&
+          (p.action === 'manage' || p.action === 'manage_permissions')
+      );
+      return matchedPermission?.unit.id || '';
+    };
+
     const targetUnitId =
       currentUnitId && currentUnitId !== '00000000-0000-0000-0000-000000000000'
         ? currentUnitId
-        : fallbackUnitId;
+        : findPermittedUnitId();
 
     if (!targetUnitId) {
       return;
@@ -154,12 +156,11 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
 
     if (diagram) {
       await diagramStore.createChart({
-        diagramId: diagram.id, // Изменено на diagramId
+        diagramId: diagram.id,
         title: chartConfig.title.text,
-        chartType: chartConfig.chartType, // Изменено на chartType
+        chartType: chartConfig.chartType,
         mapping: chartConfig.mapping,
         uiConfig: {
-          // Изменено на uiConfig
           ...chartConfig.uiConfig,
           color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
         },
@@ -167,6 +168,15 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
       navigate(-1);
     }
   };
+
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    title: { text: 'Новый график' },
+    chartType: 'bar',
+    mapping: {
+      xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
+      yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
+    },
+  });
 
   const gridColumns: CustomColumn[] = [
     ...columns.map((col) => ({

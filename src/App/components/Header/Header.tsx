@@ -10,7 +10,9 @@ import styles from './Header.module.scss';
 function Header() {
   return (
     <header className={styles.header}>
-      <LogoIcon />
+      <Link to={routes.main.create()}>
+        <LogoIcon />
+      </Link>
       <nav className={styles.nav}>
         <BellIcon />
         <Link to={routes.settings.create()}>
