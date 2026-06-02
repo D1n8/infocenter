@@ -1,19 +1,34 @@
-import CorporateCulture from './Sections/CorporateCulture';
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
+import { diagramStore } from 'store/DiagramStore';
+import { useRootStore } from 'store/RootStore/RootStore';
+
+import styles from './OperationalManagement.module.scss';
+import Culture from './Sections/Culture';
 import Economy from './Sections/Economy';
 import Production from './Sections/Production';
 import Quality from './Sections/Quality';
 import Safety from './Sections/Safety';
 
-function OperationalManagement() {
+const OperationalManagement = observer(() => {
+  const { userStore } = useRootStore();
+  useEffect(() => {
+    diagramStore.fetchDashboardData();
+
+    return () => {
+      diagramStore.resetStore();
+    };
+  }, []);
+
   return (
-    <>
-      <Production />
-      <Economy />
-      <Safety />
-      <Quality />
-      <CorporateCulture />
-    </>
+    <div className={styles.container}>
+      {userStore.hasBlockAccess('production') && <Production />}
+      {userStore.hasBlockAccess('culture') && <Culture />}
+      {userStore.hasBlockAccess('economy') && <Economy />}
+      {userStore.hasBlockAccess('safety') && <Safety />}
+      {userStore.hasBlockAccess('quality') && <Quality />}
+    </div>
   );
-}
+});
 
 export default OperationalManagement;

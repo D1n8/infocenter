@@ -5,7 +5,11 @@ import ChartListSettings from 'App/pages/ChartListSettings';
 import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
 import Profile from 'App/pages/Profile';
+import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import UserCreatePage from 'App/pages/UserCreatePage';
+import UserManagePage from 'App/pages/UserManagePage';
+import UsersListPage from 'App/pages/UsersListPage';
 import { RequireAuth, RequireGuest } from 'components/Router/ProtectedRoute';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
@@ -21,7 +25,25 @@ export const routesConfig: RouteObject[] = [
         children: [
           {
             path: routes.settings.mask,
-            element: <SettingsPage />,
+            element: <SettingsLayout />,
+            children: [
+              {
+                index: true,
+                element: <SettingsPage />,
+              },
+              {
+                path: routes.adminUsersList.mask,
+                element: <UsersListPage />,
+              },
+              {
+                path: routes.adminUserManage.mask,
+                element: <UserManagePage />,
+              },
+              {
+                path: routes.adminCreateUser.mask,
+                element: <UserCreatePage />,
+              },
+            ],
           },
           {
             path: routes.profile.mask,
@@ -32,7 +54,7 @@ export const routesConfig: RouteObject[] = [
             children: [
               {
                 index: true,
-                element: <Navigate to={routes.operationalManagement.mask} replace />,
+                element: <Navigate to={routes.operationalManagement.create()} replace />,
               },
               {
                 path: routes.operationalManagement.mask,
@@ -50,7 +72,7 @@ export const routesConfig: RouteObject[] = [
           },
           {
             path: '*',
-            element: <Navigate to={routes.operationalManagement.mask} replace />,
+            element: <Navigate to={routes.operationalManagement.create()} replace />,
           },
         ],
       },
@@ -67,6 +89,6 @@ export const routesConfig: RouteObject[] = [
   },
   {
     path: '*',
-    element: <Navigate to={routes.auth.mask} replace />,
+    element: <Navigate to={routes.auth.create()} replace />,
   },
 ];

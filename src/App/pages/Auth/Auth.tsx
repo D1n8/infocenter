@@ -22,7 +22,7 @@ function AuthPage() {
       <section className={styles.formSection}>
         <div className={styles.auth}>
           <div className={styles.logoBg}>
-            <LogoIcon width={171} height={43} />
+            <LogoIcon width={100} height={100} />
           </div>
           <form className={styles.authForm} onSubmit={handleSubmit}>
             <Input
@@ -31,6 +31,7 @@ function AuthPage() {
               onChange={(e) => setLogin(e.target.value)}
             />
             <Input
+              type="password"
               placeholder="Введите пароль"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

@@ -1,25 +1,64 @@
 import { api } from 'config/api';
 import { computed, makeObservable, observable, runInAction } from 'mobx';
+import type {
+  UserPermissionsType,
+  UserPermissionsRequestType,
+  UnitTreeItem,
+  BlockType,
+  ActionType,
+} from 'types/index';
 
-import { normalizeUserType, type UserTypeModel } from '../models/user';
+import {
+  normalizeUserType,
+  type CreateUserType,
+  type UserTypeApi,
+  type UserTypeModel,
+} from '../models/user';
 
-type PrivateFields = '_error' | '_isLoading' | '_user';
+type PrivateFields =
+  | '_error'
+  | '_isLoading'
+  | '_user'
+  | '_managedUser'
+  | '_managedPermissions'
+  | '_usersList'
+  | '_unitsTree'
+  | '_myPermissions';
 
 export default class UserStore {
   private _error = '';
   private _isLoading = false;
   private _user: UserTypeModel | null = null;
 
+  private _usersList: UserTypeModel[] = [];
+  private _unitsTree: UnitTreeItem[] = [];
+
+  private _managedUser: UserTypeModel | null = null;
+  private _managedPermissions: UserPermissionsType | null = null;
+
+  private _myPermissions: UserPermissionsType = [];
+
   constructor() {
     makeObservable<UserStore, PrivateFields>(this, {
       _error: observable,
       _isLoading: observable,
       _user: observable,
+      _usersList: observable,
+      _unitsTree: observable,
+      _managedUser: observable,
+      _managedPermissions: observable,
+      _myPermissions: observable,
 
       isAuth: computed,
       error: computed,
       isLoading: computed,
       user: computed,
+      managedUser: computed,
+      managedPermissions: computed,
+      usersList: computed,
+      unitsTree: computed,
+      myPermissions: computed,
+      canManagePermissions: computed,
     });
   }
 
@@ -39,6 +78,50 @@ export default class UserStore {
     return this._user;
   }
 
+  get managedUser(): UserTypeModel | null {
+    return this._managedUser;
+  }
+
+  get managedPermissions(): UserPermissionsType | null {
+    return this._managedPermissions;
+  }
+
+  get usersList(): UserTypeModel[] {
+    return this._usersList;
+  }
+
+  get unitsTree(): UnitTreeItem[] {
+    return this._unitsTree;
+  }
+
+  get myPermissions(): UserPermissionsType {
+    return this._myPermissions;
+  }
+
+  get canManagePermissions(): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some((p) => p.action === 'manage_permissions');
+  }
+
+  hasBlockAccess(block: BlockType, action: ActionType = 'view'): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some(
+      (p) =>
+        (p.block === block || p.block === 'all') &&
+        (p.action === action || p.action === 'manage' || p.action === 'manage_permissions')
+    );
+  }
+
+  canManageBlock(block: BlockType): boolean {
+    const userRole = this._user?.role.toLowerCase();
+    if (userRole === 'admin') return true;
+    return this._myPermissions.some(
+      (p) => (p.block === block || p.block === 'all') && p.action === 'manage'
+    );
+  }
+
   async loginUser(login: string, password: string) {
     this._error = '';
     this._isLoading = true;
@@ -53,9 +136,13 @@ export default class UserStore {
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
       const userResponse = await api.get('/users/me');
+      const permsResponse = await api.get<UserPermissionsType>(
+        `/permissions/users/${userResponse.data.id}`
+      );
 
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
+        this._myPermissions = permsResponse.data;
       });
     } catch {
       runInAction(() => {
@@ -77,8 +164,13 @@ export default class UserStore {
 
     try {
       const userResponse = await api.get('/users/me');
+      const permsResponse = await api.get<UserPermissionsType>(
+        `/permissions/users/${userResponse.data.id}`
+      );
+
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
+        this._myPermissions = permsResponse.data;
       });
     } catch {
       this.logout();
@@ -94,7 +186,170 @@ export default class UserStore {
     localStorage.removeItem('refresh_token');
     runInAction(() => {
       this._user = null;
+      this._myPermissions = [];
     });
+  }
+
+  async fetchUserData(userId: string) {
+    this._isLoading = true;
+    this._error = '';
+
+    const [userResult, permissionsResult] = await Promise.allSettled([
+      api.get<UserTypeApi>(`/users/${userId}`),
+      api.get<UserPermissionsType>(`/permissions/users/${userId}`),
+    ]);
+
+    runInAction(() => {
+      if (userResult.status === 'fulfilled') {
+        this._managedUser = normalizeUserType(userResult.value.data);
+      } else {
+        this._error = 'Не удалось загрузить данные пользователя';
+      }
+
+      if (permissionsResult.status === 'fulfilled') {
+        this._managedPermissions = permissionsResult.value.data;
+      } else {
+        this._managedPermissions = [];
+      }
+
+      this._isLoading = false;
+    });
+  }
+
+  resetManagedUser() {
+    runInAction(() => {
+      this._managedUser = null;
+      this._managedPermissions = null;
+      this._error = '';
+    });
+  }
+
+  async createUser(user: CreateUserType): Promise<string | null> {
+    this._isLoading = true;
+    this._error = '';
+    try {
+      const response = await api.post<{ id: string }>('/users/', {
+        login: user.login,
+        full_name: user.full_name,
+        role: user.role,
+        job_title: user.job_title,
+        email: user.email,
+        is_active: user.is_active,
+        password: user.password,
+      });
+      return response.data.id;
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось создать пользователя';
+      });
+      return null;
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async updateUser(userId: string, data: Partial<CreateUserType>) {
+    this._isLoading = true;
+    this._error = '';
+    try {
+      const response = await api.patch<UserTypeApi>(`/users/${userId}`, {
+        login: data.login,
+        full_name: data.full_name,
+        role: data.role,
+        job_title: data.job_title,
+        email: data.email,
+        is_active: data.is_active,
+      });
+      runInAction(() => {
+        this._managedUser = normalizeUserType(response.data);
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось обновить данные пользователя';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async fetchUsersList() {
+    this._usersList = [];
+    try {
+      const response = await api.get<UserTypeApi[]>('/users/');
+
+      runInAction(() => {
+        this._usersList = response.data.map(normalizeUserType);
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось получить список пользователей';
+      });
+    }
+  }
+
+  async fetchUnitsTree() {
+    this._isLoading = true;
+    try {
+      const response = await api.get<UnitTreeItem[]>('/permissions/units/tree');
+      runInAction(() => {
+        this._unitsTree = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось загрузить структуру подразделений';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async grantPermissions(userId: string, payload: UserPermissionsRequestType) {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      const response = await api.post<UserPermissionsType>(`/permissions/users/${userId}`, payload);
+
+      runInAction(() => {
+        this._managedPermissions = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось выдать права пользователю';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async revokePermissions(userId: string, payload: UserPermissionsRequestType) {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      await api.delete(`/permissions/users/${userId}`, { data: payload });
+      const response = await api.get<UserPermissionsType>(`/permissions/users/${userId}`);
+
+      runInAction(() => {
+        this._managedPermissions = response.data;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось отозвать права у пользователя';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
   }
 }
 

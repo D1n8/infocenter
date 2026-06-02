@@ -15,6 +15,18 @@ export const routes = {
     mask: 'settings',
     create: () => '/settings',
   },
+  adminUsersList: {
+    mask: 'users-list',
+    create: () => '/settings/users-list',
+  },
+  adminUserManage: {
+    mask: 'user-manage/:id',
+    create: (id: string) => `/settings/user-manage/${id}`,
+  },
+  adminCreateUser: {
+    mask: 'user-create',
+    create: () => '/settings/user-create',
+  },
   chartListSettings: {
     mask: '/operational-management/chart-list-settings/:sectionId',
     create: (sectionId: string) => `/operational-management/chart-list-settings/${sectionId}`,

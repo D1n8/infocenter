@@ -5,8 +5,12 @@ import Dropdown from 'components/Dropdown';
 import type { DropdownOption } from 'components/Dropdown/Dropdown';
 import MaximizeButton from 'components/IconButtons/MaximizeButton';
 import MinimizeButton from 'components/IconButtons/MinimizeButton';
-import { useEffect, useState } from 'react';
-import type { SectionType } from 'types/index';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState, useMemo } from 'react';
+import { diagramStore } from 'store/DiagramStore';
+import { useRootStore } from 'store/RootStore/RootStore';
+import type { CardType, BlockType } from 'types/index';
 
 import styles from './Section.module.scss';
 
@@ -17,9 +21,23 @@ const LIMIT_OPTIONS: DropdownOption[] = [
   { value: 'all', label: 'Показать все графики' },
 ];
 
-function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }: SectionType) {
+type SectionProps = {
+  isMaximize: boolean;
+  setIsMaximize: (flag: boolean) => void;
+  title: string;
+  blockId: BlockType;
+  onClick: () => void;
+};
+
+const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }: SectionProps) => {
+  const { userStore } = useRootStore();
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
   const [limit, setLimit] = useState<string>('6');
+
+  useEffect(() => {
+    diagramStore.fetchDiagrams(0, 100, blockId);
+    diagramStore.fetchCharts();
+  }, [blockId]);
 
   useEffect(() => {
     if (isMaximize && !hasRenderedAll) {
@@ -33,28 +51,66 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
     }
   }, [isMaximize]);
 
+  const cards: CardType[] = useMemo(() => {
+    const rawCharts = toJS(diagramStore.charts);
+    const rawDiagrams = toJS(diagramStore.diagrams);
+
+    return rawCharts
+      .filter((chart) => rawDiagrams.some((d) => d.id === chart.diagramId && d.block === blockId))
+      .map((chart) => {
+        const diagram = rawDiagrams.find((d) => d.id === chart.diagramId);
+        return {
+          id: chart.id,
+          diagramId: chart.diagramId,
+          order: diagram ? (diagram.order ?? 0) : 0,
+          data: diagram ? diagram.rows : [],
+          config: {
+            title: { text: chart.title },
+            chartType: chart.chartType,
+            mapping: chart.mapping,
+            uiConfig: {
+              ...chart.uiConfig,
+              color: chart.uiConfig?.color,
+            },
+          },
+        };
+      })
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [diagramStore.charts, diagramStore.diagrams, blockId]);
+
+  useEffect(() => {
+    if (cards.length <= 3 && isMaximize) {
+      setIsMaximize(false);
+    }
+  }, [cards.length, isMaximize, setIsMaximize]);
+
   const handleLimitChange = (opt: DropdownOption) => {
     setLimit(String(opt.value));
   };
+
+  const canManage = userStore.canManageBlock(blockId);
+  const hasMoreThanThree = cards.length > 3;
 
   return (
     <section className={styles.section}>
       <div className={styles.topContainer}>
         <div className={styles.titleContainer}>
           <h2 className={styles.title}>{title}</h2>
-          {isMaximize ? (
-            <MinimizeButton
-              onClick={() => setIsMaximize(false)}
-              className={classNames(styles.sizeBtn, styles.minBtn)}
-            />
-          ) : (
-            <MaximizeButton
-              onClick={() => setIsMaximize(true)}
-              className={classNames(styles.sizeBtn, styles.maxBtn)}
-            />
-          )}
 
-          {isMaximize && (
+          {hasMoreThanThree &&
+            (isMaximize ? (
+              <MinimizeButton
+                onClick={() => setIsMaximize(false)}
+                className={classNames(styles.sizeBtn, styles.minBtn)}
+              />
+            ) : (
+              <MaximizeButton
+                onClick={() => setIsMaximize(true)}
+                className={classNames(styles.sizeBtn, styles.maxBtn)}
+              />
+            ))}
+
+          {isMaximize && hasMoreThanThree && (
             <Dropdown
               id={`limit-select-${title}`}
               options={LIMIT_OPTIONS}
@@ -63,11 +119,19 @@ function Section({ isMaximize, setIsMaximize, cards, setCards, title, onClick }:
             />
           )}
         </div>
-        <Button onClick={onClick} children={'Настроить графики'} />
+        {canManage && <Button onClick={onClick} children={'Настроить графики'} />}
       </div>
-      <ChartList isMaximize={isMaximize} cards={cards} setCards={setCards} limit={limit} />
+
+      {diagramStore.isLoading ? (
+        <div className={styles.loaderContainer}>
+          <div className={styles.spinner} />
+          <span className={styles.loaderText}>Загрузка графиков...</span>
+        </div>
+      ) : (
+        <ChartList isMaximize={isMaximize} cards={cards} limit={limit} />
+      )}
     </section>
   );
-}
+});
 
 export default Section;

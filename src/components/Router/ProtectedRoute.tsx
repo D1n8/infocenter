@@ -17,7 +17,7 @@ export const RequireGuest = observer(() => {
   const { userStore } = useRootStore();
 
   if (userStore.isAuth) {
-    return <Navigate to={routes.main.mask} replace />;
+    return <Navigate to={routes.main.create()} replace />;
   }
 
   return <Outlet />;

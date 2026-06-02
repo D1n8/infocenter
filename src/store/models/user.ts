@@ -1,9 +1,6 @@
-export type RoleType = {
-  role: 'inspector';
-};
+export type RoleType = 'user' | 'admin';
 
-export type UserTypeApi = {
-  id: string;
+export type UserType = {
   login: string;
   full_name: string;
   role: RoleType;
@@ -11,6 +8,10 @@ export type UserTypeApi = {
   email: string;
   is_active: boolean;
 };
+
+export type UserTypeApi = {
+  id: string;
+} & UserType;
 
 export type UserTypeModel = {
   id: string;
@@ -31,3 +32,7 @@ export const normalizeUserType = (user: UserTypeApi): UserTypeModel => ({
   email: user.email,
   isActive: user.is_active,
 });
+
+export type CreateUserType = {
+  password: string;
+} & UserType;

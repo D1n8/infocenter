@@ -5,11 +5,12 @@ import styles from './SettingsItem.module.scss';
 
 type SettingsPageType = {
   children: React.ReactNode;
+  href?: string;
 };
 
-function SettingsItem({ children }: SettingsPageType) {
+function SettingsItem({ children, href = '#' }: SettingsPageType) {
   return (
-    <Link className={styles.settingsItem} to={'#'}>
+    <Link className={styles.settingsItem} to={href}>
       <span className={styles.text}>{children}</span>
       <Chevron />
     </Link>

@@ -16,7 +16,7 @@ import ChartCardDraggable from '../ChartCard/ChartCardDraggable';
 
 import styles from './ChartList.module.scss';
 
-function ChartList({ isMaximize, cards, setCards }: ChartListType) {
+function ChartListDraggable({ isMaximize, cards, setCards }: ChartListType) {
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function ChartList({ isMaximize, cards, setCards }: ChartListType) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (setCards && over && active.id !== over.id) {
       setCards((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
@@ -55,6 +55,7 @@ function ChartList({ isMaximize, cards, setCards }: ChartListType) {
               <ChartCardDraggable
                 key={card.id}
                 id={card.id}
+                diagramId={card.diagramId}
                 data={card.data}
                 config={card.config}
               />
@@ -66,4 +67,4 @@ function ChartList({ isMaximize, cards, setCards }: ChartListType) {
   );
 }
 
-export default ChartList;
+export default ChartListDraggable;

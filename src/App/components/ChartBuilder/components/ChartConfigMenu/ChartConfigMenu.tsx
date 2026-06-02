@@ -13,7 +13,7 @@ type Props = {
 };
 
 function ChartConfigMenu({ columns, chartConfig, setChartConfig }: Props) {
-  const currentSchema = CHART_SCHEMAS[chartConfig.chartType];
+  const currentSchema = CHART_SCHEMAS[chartConfig.chartType] || [];
 
   const handleMappingChange = (key: string, value: string) => {
     setChartConfig((prev) => ({
@@ -30,6 +30,16 @@ function ChartConfigMenu({ columns, chartConfig, setChartConfig }: Props) {
       ...prev,
       chartType: newType as ChartConfig['chartType'],
       mapping: {},
+    }));
+  };
+
+  const handleColorChange = (color: string) => {
+    setChartConfig((prev) => ({
+      ...prev,
+      uiConfig: {
+        ...prev.uiConfig,
+        color,
+      },
     }));
   };
 
@@ -68,6 +78,19 @@ function ChartConfigMenu({ columns, chartConfig, setChartConfig }: Props) {
             value={chartConfig.chartType}
             onChange={(opt) => handleTypeChange(String(opt.value))}
             placeholder="Выберите тип графика"
+          />
+        </div>
+
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="chartColor">
+            Цвет графика
+          </label>
+          <input
+            type="color"
+            id="chartColor"
+            className={styles.colorPicker}
+            value={chartConfig.uiConfig?.color || '#000000'}
+            onChange={(e) => handleColorChange(e.target.value)}
           />
         </div>
 

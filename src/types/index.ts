@@ -36,6 +36,7 @@ export type ChartConfig = {
 export type BaseColumn = {
   key: string;
   name: string;
+  type?: 'string' | 'number' | 'date';
 };
 
 export type CustomColumn = Column<RowData> & {
@@ -46,6 +47,8 @@ export type CustomColumn = Column<RowData> & {
 
 export type CardType = {
   id: number;
+  diagramId?: string;
+  order?: number;
   data: RowData[];
   config: ChartConfig;
   isHidden?: boolean;
@@ -53,7 +56,7 @@ export type CardType = {
 
 export type ChartListType = {
   cards: CardType[];
-  setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+  setCards?: React.Dispatch<React.SetStateAction<CardType[]>>;
   isMaximize?: boolean;
   limit?: string;
 };
@@ -62,4 +65,40 @@ export type SectionType = ChartListType & {
   setIsMaximize: (flag: boolean) => void;
   title?: string;
   onClick?: () => void;
+};
+
+export type LevelType = 'enterprise' | 'shop' | 'area';
+
+export type BlockType = 'safety' | 'quality' | 'production' | 'economy' | 'culture';
+
+export type ActionType = 'view' | 'manage' | 'manage_permissions';
+
+export type PermissionType = {
+  id: string;
+  unit: {
+    id: string;
+    name: string;
+    level_type: LevelType;
+  };
+  block: BlockType | 'all';
+  action: ActionType;
+};
+
+export type UserPermissionsType = PermissionType[];
+
+export type PermissionGrantType = {
+  unit_id: string;
+  block: BlockType | 'all';
+  action: ActionType;
+};
+
+export type UserPermissionsRequestType = {
+  permissions: PermissionGrantType[];
+};
+
+export type UnitTreeItem = {
+  id: string;
+  name: string;
+  level: LevelType;
+  children?: UnitTreeItem[];
 };
