@@ -8,7 +8,7 @@ import { DataGrid } from 'react-data-grid';
 import { useNavigate, useLocation } from 'react-router';
 import { diagramStore } from 'store/DiagramStore';
 import { useRootStore } from 'store/RootStore/RootStore';
-import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
+import type { RowData, ChartConfig, BaseColumn, CustomColumn, BlockType } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
 import { parseClipboardData } from 'utils/clipboard';
 
@@ -49,7 +49,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
     diagramId?: string;
   } | null;
 
-  const currentBlock = stateContext?.block || 'production';
+  const currentBlock = (stateContext?.block as BlockType) || 'production';
   const currentUnitId = stateContext?.unitId || '';
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
@@ -58,6 +58,9 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
     mapping: {
       xAxis: initialColumns.length > 0 ? initialColumns[0].key : '',
       yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
+    },
+    uiConfig: {
+      color: SECTION_COLORS[currentBlock],
     },
   });
 
@@ -100,14 +103,17 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
             title: { text: chart.title },
             chartType: chart.chartType,
             mapping: chart.mapping,
-            uiConfig: chart.uiConfig,
+            uiConfig: {
+              ...chart.uiConfig,
+              color: chart.uiConfig?.color || SECTION_COLORS[currentBlock],
+            },
           });
         }
       }
     };
 
     loadEditData();
-  }, [stateContext, userStore]);
+  }, [stateContext, userStore, currentBlock]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const clipboardData = e.clipboardData.getData('Text');
@@ -165,7 +171,6 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
 
   const handleSave = async () => {
     if (columns.length === 0 || rows.length === 0) {
-      console.warn('Сохранение прервано: пустая таблица (нет строк или колонок)');
       return;
     }
 
@@ -195,9 +200,6 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
         : findPermittedUnitId();
 
     if (!targetUnitId) {
-      console.warn(
-        'Сохранение прервано: не удалось определить разрешенный unit_id для пользователя'
-      );
       return;
     }
 
@@ -239,7 +241,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
     }
 
     const payloadDiagram = {
-      block: currentBlock as any,
+      block: currentBlock,
       unit_id: targetUnitId,
       columns: columnsWithTypes,
       rows: normalizedRows,
@@ -249,10 +251,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
       title: chartConfig.title.text,
       chartType: chartConfig.chartType,
       mapping: normalizedMapping,
-      uiConfig: {
-        ...chartConfig.uiConfig,
-        color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
-      },
+      uiConfig: chartConfig.uiConfig,
     };
 
     if (stateContext?.isEditing && stateContext.diagramId && stateContext.chartId) {
@@ -293,18 +292,12 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
   ];
 
   const chartOption = useMemo(() => {
-    const configWithColor: ChartConfig = {
-      ...chartConfig,
-      uiConfig: {
-        ...chartConfig.uiConfig,
-        color: chartConfig.uiConfig?.color || SECTION_COLORS[currentBlock],
-      },
-    };
-    return transformDataForECharts(rows, configWithColor);
-  }, [rows, chartConfig, currentBlock]);
+    return transformDataForECharts(rows, chartConfig);
+  }, [rows, chartConfig]);
 
   const isChartReady = useMemo(() => {
-    const currentSchema = CHART_SCHEMAS[chartConfig.chartType] || [];
+    const currentSchema = CHART_SCHEMAS[chartConfig.chartType];
+    if (!currentSchema) return false;
     return currentSchema
       .filter((field) => field.required)
       .every((field) => chartConfig.mapping[field.key]);
