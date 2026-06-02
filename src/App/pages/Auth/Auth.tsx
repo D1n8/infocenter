@@ -22,7 +22,7 @@ function AuthPage() {
       <section className={styles.formSection}>
         <div className={styles.auth}>
           <div className={styles.logoBg}>
-            <LogoIcon width={171} height={43} />
+            <LogoIcon width={100} height={100} />
           </div>
           <form className={styles.authForm} onSubmit={handleSubmit}>
             <Input
