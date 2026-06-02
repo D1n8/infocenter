@@ -10,7 +10,7 @@ import type {
 
 import {
   normalizeUserType,
-  type CreateUserType,
+  type UserType,
   type UserTypeApi,
   type UserTypeModel,
 } from '../models/user';
@@ -224,7 +224,7 @@ export default class UserStore {
     });
   }
 
-  async createUser(user: CreateUserType): Promise<string | null> {
+  async createUser(user: UserType): Promise<string | null> {
     this._isLoading = true;
     this._error = '';
     try {
@@ -235,7 +235,6 @@ export default class UserStore {
         job_title: user.job_title,
         email: user.email,
         is_active: user.is_active,
-        password: user.password,
       });
       return response.data.id;
     } catch {
@@ -250,7 +249,7 @@ export default class UserStore {
     }
   }
 
-  async updateUser(userId: string, data: Partial<CreateUserType>) {
+  async updateUser(userId: string, data: Partial<UserType>) {
     this._isLoading = true;
     this._error = '';
     try {
