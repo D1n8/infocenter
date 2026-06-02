@@ -95,17 +95,13 @@ const ChartListSettings = observer(() => {
   return (
     <div className={styles.chartListSettings}>
       <div className={styles.topContainer}>
-        <PageTitle title="Настройки" onNavigate={navigate} />
+        <PageTitle title="Настройки" />
         <Button onClick={handleAddChartClick}>Добавить график</Button>
       </div>
 
       <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
 
-      <SaveButtons
-        handleSave={handleSave}
-        isLoading={diagramStore.isLoading}
-        onNavigate={navigate}
-      />
+      <SaveButtons handleSave={handleSave} isLoading={diagramStore.isLoading} />
     </div>
   );
 });

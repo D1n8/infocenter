@@ -116,7 +116,7 @@ const UserManagePage = observer(() => {
 
   return (
     <>
-      <PageTitle title="Редактирование пользователя" onNavigate={navigate} />
+      <PageTitle title="Редактирование пользователя" />
 
       <div className={layoutStyles.settingsContainer}>
         <Input className={layoutStyles.settingsInput} icon={<Search />} placeholder="Поиск" />
@@ -159,7 +159,7 @@ const UserManagePage = observer(() => {
             />
           </div>
 
-          <SaveButtons isLoading={userStore.isLoading} onNavigate={navigate} isSubmitType={true} />
+          <SaveButtons isLoading={userStore.isLoading} isSubmitType={true} />
         </form>
       </div>
     </>

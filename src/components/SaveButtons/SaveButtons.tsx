@@ -1,19 +1,20 @@
 import Button from 'components/Button';
-import type { NavigateFunction } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 
 type SaveButtonsType = {
   isLoading: boolean;
-  onNavigate: NavigateFunction;
   handleSave?: () => void;
   isSubmitType?: boolean;
 };
 
-function SaveButtons({ isLoading, onNavigate, isSubmitType = false, handleSave }: SaveButtonsType) {
+function SaveButtons({ isLoading, isSubmitType = false, handleSave }: SaveButtonsType) {
+  const navigate = useNavigate();
+
   return (
     <div className={layoutStyles.bottomContainer}>
       <div className={layoutStyles.btnContainer}>
-        <Button className={layoutStyles.cancelBtn} onClick={() => onNavigate(-1)}>
+        <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
           Отменить
         </Button>
         {isSubmitType ? (

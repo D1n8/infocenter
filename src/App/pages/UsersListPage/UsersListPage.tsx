@@ -25,7 +25,7 @@ const UsersListPage = observer(() => {
 
   return (
     <>
-      <PageTitle title="Управление пользователями" onNavigate={navigate} />
+      <PageTitle title="Управление пользователями" />
 
       <div className={layoutStyles.settingsContainer}>
         <div className={styles.topContainer}>

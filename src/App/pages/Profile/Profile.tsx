@@ -1,13 +1,11 @@
 import Button from 'components/Button';
 import PageTitle from 'components/PageTitle';
 import { observer } from 'mobx-react-lite';
-import { useNavigate } from 'react-router-dom';
 import { useRootStore } from 'store/RootStore/RootStore';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 
 const Profile = observer(() => {
   const { userStore } = useRootStore();
-  const navigate = useNavigate();
 
   const user = userStore.user;
 
@@ -17,7 +15,7 @@ const Profile = observer(() => {
 
   return (
     <>
-      <PageTitle title="Профиль" onNavigate={navigate} />
+      <PageTitle title="Профиль" />
 
       <div className={layoutStyles.settingsContainer}>
         <div

@@ -347,11 +347,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
         </button>
       </div>
 
-      <SaveButtons
-        handleSave={handleSave}
-        isLoading={diagramStore.isLoading}
-        onNavigate={navigate}
-      />
+      <SaveButtons handleSave={handleSave} isLoading={diagramStore.isLoading} />
     </div>
   );
 });

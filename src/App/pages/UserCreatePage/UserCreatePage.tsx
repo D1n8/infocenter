@@ -51,7 +51,7 @@ const UserCreatePage = observer(() => {
 
   return (
     <>
-      <PageTitle title="Добавить пользователя" onNavigate={navigate} />
+      <PageTitle title="Добавить пользователя" />
 
       <div className={layoutStyles.settingsContainer}>
         <Input className={layoutStyles.settingsInput} icon={<Search />} placeholder="Поиск" />
