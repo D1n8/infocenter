@@ -1,4 +1,4 @@
-import Button from 'components/Button';
+import SaveButtons from 'components/SaveButtons';
 import { CHART_SCHEMAS } from 'config/chartSchemas';
 import ReactECharts from 'echarts-for-react';
 import { toJS } from 'mobx';
@@ -8,7 +8,6 @@ import { DataGrid } from 'react-data-grid';
 import { useNavigate, useLocation } from 'react-router';
 import { diagramStore } from 'store/DiagramStore';
 import { useRootStore } from 'store/RootStore/RootStore';
-import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { RowData, ChartConfig, BaseColumn, CustomColumn } from 'types/index';
 import { transformDataForECharts } from 'utils/chartTransformer';
 import { parseClipboardData } from 'utils/clipboard';
@@ -348,16 +347,11 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
         </button>
       </div>
 
-      <div className={layoutStyles.bottomContainer}>
-        <div className={layoutStyles.btnContainer}>
-          <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
-            Отменить
-          </Button>
-          <Button onClick={handleSave} disabled={diagramStore.isLoading}>
-            {diagramStore.isLoading ? 'Сохранение...' : 'Сохранить'}
-          </Button>
-        </div>
-      </div>
+      <SaveButtons
+        handleSave={handleSave}
+        isLoading={diagramStore.isLoading}
+        onNavigate={navigate}
+      />
     </div>
   );
 });

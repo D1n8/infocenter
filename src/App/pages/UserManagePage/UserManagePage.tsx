@@ -1,9 +1,9 @@
 import classNames from 'classnames';
-import Button from 'components/Button';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
 import PageTitle from 'components/PageTitle/PageTitle';
 import PermissionsTree from 'components/PermissionsTree/PermissionsTree';
+import SaveButtons from 'components/SaveButtons';
 import { routes } from 'config/routes';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
@@ -159,16 +159,7 @@ const UserManagePage = observer(() => {
             />
           </div>
 
-          <div className={layoutStyles.bottomContainer}>
-            <div className={layoutStyles.btnContainer}>
-              <Button type="button" className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
-                Отменить
-              </Button>
-              <Button type="submit" disabled={userStore.isLoading}>
-                {userStore.isLoading ? 'Сохранение...' : 'Сохранить'}
-              </Button>
-            </div>
-          </div>
+          <SaveButtons isLoading={userStore.isLoading} onNavigate={navigate} isSubmitType={true} />
         </form>
       </div>
     </>

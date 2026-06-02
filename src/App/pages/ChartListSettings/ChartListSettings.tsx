@@ -1,13 +1,13 @@
 import ChartListDraggable from 'App/components/ChartList/ChartListDraggable';
 import Button from 'components/Button';
-import BackButton from 'components/IconButtons/BackButton';
+import PageTitle from 'components/PageTitle';
+import SaveButtons from 'components/SaveButtons';
 import { routes } from 'config/routes';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { diagramStore } from 'store/DiagramStore';
-import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { CardType } from 'types/index';
 
 import styles from './ChartListSettings.module.scss';
@@ -95,25 +95,17 @@ const ChartListSettings = observer(() => {
   return (
     <div className={styles.chartListSettings}>
       <div className={styles.topContainer}>
-        <div className={layoutStyles.titleContainer}>
-          <BackButton onClick={() => navigate(-1)}>Назад</BackButton>
-          <h2 className={layoutStyles.title}>Настройки</h2>
-        </div>
+        <PageTitle title="Настройки" onNavigate={navigate} />
         <Button onClick={handleAddChartClick}>Добавить график</Button>
       </div>
 
       <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
 
-      <div className={layoutStyles.bottomContainer}>
-        <div className={layoutStyles.btnContainer}>
-          <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
-            Отменить
-          </Button>
-          <Button onClick={handleSave} disabled={diagramStore.isLoading}>
-            {diagramStore.isLoading ? 'Сохранение...' : 'Сохранить'}
-          </Button>
-        </div>
-      </div>
+      <SaveButtons
+        handleSave={handleSave}
+        isLoading={diagramStore.isLoading}
+        onNavigate={navigate}
+      />
     </div>
   );
 });

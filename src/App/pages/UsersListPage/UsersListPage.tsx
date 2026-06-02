@@ -45,15 +45,6 @@ const UsersListPage = observer(() => {
             />
           ))}
         </section>
-
-        {/* <div className={layoutStyles.bottomContainer}>
-          <div className={layoutStyles.btnContainer}>
-            <Button className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
-              Отменить
-            </Button>
-            <Button>Сохранить</Button>
-          </div>
-        </div> */}
       </div>
     </>
   );
