@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { api } from 'config/api';
 import { computed, makeObservable, observable, runInAction } from 'mobx';
 import type {
@@ -174,6 +175,61 @@ export default class UserStore {
       });
     } catch {
       this.logout();
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<string | null> {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      await api.patch('/users/me/password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      return 'Пароль успешно изменён';
+    } catch (err: unknown) {
+      runInAction(() => {
+        if (isAxiosError(err) && err.response?.data?.detail) {
+          this._error =
+            typeof err.response.data.detail === 'string'
+              ? err.response.data.detail
+              : 'Ошибка валидации пароля';
+        } else {
+          this._error = 'Не удалось изменить пароль';
+        }
+      });
+      return null;
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async resetUserPassword(userId: string): Promise<string | null> {
+    this._isLoading = true;
+    this._error = '';
+
+    try {
+      const response = await api.post<{ detail: string }>(`/users/${userId}/reset-password`);
+      return response.data.detail || 'Новый пароль отправлен на почту';
+    } catch (err: unknown) {
+      runInAction(() => {
+        if (isAxiosError(err) && err.response?.data?.detail) {
+          this._error =
+            typeof err.response.data.detail === 'string'
+              ? err.response.data.detail
+              : 'Ошибка сброса пароля';
+        } else {
+          this._error = 'Не удалось сбросить пароль';
+        }
+      });
+      return null;
     } finally {
       runInAction(() => {
         this._isLoading = false;
