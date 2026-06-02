@@ -89,7 +89,7 @@ const UserManagePage = observer(() => {
         )
     );
 
-    const promises: Promise<void | null>[] = [
+    const promises: Promise<void>[] = [
       userStore.updateUser(id, {
         login: formData.login,
         email: formData.email,
