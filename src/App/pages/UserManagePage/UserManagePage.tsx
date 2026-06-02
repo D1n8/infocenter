@@ -1,9 +1,9 @@
 import classNames from 'classnames';
+import Button from 'components/Button';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
 import PageTitle from 'components/PageTitle/PageTitle';
 import PermissionsTree from 'components/PermissionsTree/PermissionsTree';
-import SaveButtons from 'components/SaveButtons';
 import { routes } from 'config/routes';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
@@ -37,6 +37,10 @@ const UserManagePage = observer(() => {
   });
 
   const [selectedPermissions, setSelectedPermissions] = useState<PermissionGrantType[]>([]);
+  const [resetMessage, setResetMessage] = useState<{
+    text: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -110,6 +114,24 @@ const UserManagePage = observer(() => {
     navigate(routes.adminUsersList.create());
   };
 
+  const handleResetPassword = async () => {
+    if (!id) return;
+
+    const confirmReset = window.confirm(
+      'Вы уверены, что хотите сбросить пароль этого пользователя? Новый пароль будет отправлен ему на почту.'
+    );
+    if (!confirmReset) return;
+
+    setResetMessage(null);
+    const successMessage = await userStore.resetUserPassword(id);
+
+    if (successMessage) {
+      setResetMessage({ text: successMessage, type: 'success' });
+    } else {
+      setResetMessage({ text: userStore.error, type: 'error' });
+    }
+  };
+
   if (userStore.isLoading && !userStore.managedUser) {
     return <div className={layoutStyles.settingsContainer}>Загрузка данных...</div>;
   }
@@ -159,7 +181,45 @@ const UserManagePage = observer(() => {
             />
           </div>
 
-          <SaveButtons isLoading={userStore.isLoading} isSubmitType={true} />
+          {resetMessage && (
+            <div
+              style={{
+                color: resetMessage.type === 'success' ? '#52c41a' : '#ff4d4f',
+                fontSize: '14px',
+                marginBottom: '16px',
+              }}
+            >
+              {resetMessage.text}
+            </div>
+          )}
+
+          <div className={layoutStyles.bottomContainer}>
+            <div
+              className={layoutStyles.btnContainer}
+              style={{ width: '100%', justifyContent: 'space-between' }}
+            >
+              <Button
+                type="button"
+                onClick={handleResetPassword}
+                disabled={userStore.isLoading}
+                style={{ backgroundColor: '#fff', color: '#ff4d4f', border: '1px solid #ff4d4f' }}
+              >
+                Сбросить пароль
+              </Button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <Button
+                  type="button"
+                  className={layoutStyles.cancelBtn}
+                  onClick={() => navigate(-1)}
+                >
+                  Отменить
+                </Button>
+                <Button type="submit" disabled={userStore.isLoading}>
+                  {userStore.isLoading ? 'Сохранение...' : 'Сохранить'}
+                </Button>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     </>
