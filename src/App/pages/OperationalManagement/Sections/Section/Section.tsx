@@ -1,6 +1,7 @@
 import ChartList from 'App/components/ChartList/ChartList';
 import classNames from 'classnames';
 import Button from 'components/Button';
+import ChartListSkeleton from 'components/ChartListSkeleton/ChartListSkeleton';
 import Dropdown from 'components/Dropdown';
 import type { DropdownOption } from 'components/Dropdown/Dropdown';
 import MaximizeButton from 'components/IconButtons/MaximizeButton';
@@ -33,11 +34,6 @@ const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }
   const { userStore } = useRootStore();
   const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
   const [limit, setLimit] = useState<string>('6');
-
-  useEffect(() => {
-    diagramStore.fetchDiagrams(0, 100, blockId);
-    diagramStore.fetchCharts();
-  }, [blockId]);
 
   useEffect(() => {
     if (isMaximize && !hasRenderedAll) {
@@ -123,12 +119,11 @@ const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }
       </div>
 
       {diagramStore.isLoading ? (
-        <div className={styles.loaderContainer}>
-          <div className={styles.spinner} />
-          <span className={styles.loaderText}>Загрузка графиков...</span>
-        </div>
-      ) : (
+        <ChartListSkeleton />
+      ) : cards.length > 0 ? (
         <ChartList isMaximize={isMaximize} cards={cards} limit={limit} />
+      ) : (
+        <div className={styles.emptyState}>В данном разделе пока нет графиков</div>
       )}
     </section>
   );
