@@ -32,7 +32,3 @@ export const normalizeUserType = (user: UserTypeApi): UserTypeModel => ({
   email: user.email,
   isActive: user.is_active,
 });
-
-export type CreateUserType = {
-  password: string;
-} & UserType;
