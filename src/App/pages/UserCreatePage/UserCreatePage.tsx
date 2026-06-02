@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRootStore } from 'store/RootStore/RootStore';
-import type { CreateUserType } from 'store/models/user';
+import type { UserType } from 'store/models/user';
 import layoutStyles from 'styles/shared/Layout.module.scss';
 import type { PermissionGrantType } from 'types/index';
 
@@ -20,14 +20,13 @@ const UserCreatePage = observer(() => {
   const navigate = useNavigate();
   const { userStore } = useRootStore();
 
-  const [data, setData] = useState<CreateUserType>({
+  const [data, setData] = useState<UserType>({
     login: '',
     email: '',
     full_name: '',
     role: 'user',
     job_title: '',
     is_active: true,
-    password: '12345',
   });
 
   const [permissions, setPermissions] = useState<PermissionGrantType[]>([]);

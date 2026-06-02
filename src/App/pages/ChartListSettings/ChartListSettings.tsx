@@ -1,5 +1,6 @@
 import ChartListDraggable from 'App/components/ChartList/ChartListDraggable';
 import Button from 'components/Button';
+import ChartListSkeleton from 'components/ChartListSkeleton/ChartListSkeleton';
 import PageTitle from 'components/PageTitle';
 import SaveButtons from 'components/SaveButtons';
 import { routes } from 'config/routes';
@@ -78,7 +79,11 @@ const ChartListSettings = observer(() => {
         <Button onClick={handleAddChartClick}>Добавить график</Button>
       </div>
 
-      <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
+      {diagramStore.isLoading ? (
+        <ChartListSkeleton />
+      ) : (
+        <ChartListDraggable cards={cards} setCards={setCards} isMaximize={true} />
+      )}
 
       <SaveButtons handleSave={handleSave} isLoading={diagramStore.isLoading} />
     </div>
