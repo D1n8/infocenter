@@ -21,21 +21,13 @@ const LIMIT_OPTIONS: DropdownOption[] = [
   { value: 'all', label: 'Показать все графики' },
 ];
 
-const SECTION_COLORS: Record<string, string> = {
-  production: '#FADB14',
-  economy: '#52C41A',
-  safety: '#FF4D4F',
-  quality: '#002766',
-  culture: '#40A9FF',
-};
-
-interface SectionProps {
+type SectionProps = {
   isMaximize: boolean;
   setIsMaximize: (flag: boolean) => void;
   title: string;
   blockId: BlockType;
   onClick: () => void;
-}
+};
 
 const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }: SectionProps) => {
   const { userStore } = useRootStore();
@@ -78,7 +70,7 @@ const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }
             mapping: chart.mapping,
             uiConfig: {
               ...chart.uiConfig,
-              color: chart.uiConfig?.color || SECTION_COLORS[blockId],
+              color: chart.uiConfig?.color,
             },
           },
         };
@@ -136,7 +128,7 @@ const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }
           <span className={styles.loaderText}>Загрузка графиков...</span>
         </div>
       ) : (
-        <ChartList isMaximize={isMaximize} cards={cards} setCards={() => {}} limit={limit} />
+        <ChartList isMaximize={isMaximize} cards={cards} limit={limit} />
       )}
     </section>
   );

@@ -8,27 +8,19 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { diagramStore } from 'store/DiagramStore';
-import type { CardType } from 'types/index';
+import type { CardType, BlockType } from 'types/index';
 
 import styles from './ChartListSettings.module.scss';
-
-const SECTION_COLORS: Record<string, string> = {
-  production: '#FADB14',
-  economy: '#52C41A',
-  safety: '#FF4D4F',
-  quality: '#002766',
-  culture: '#40A9FF',
-};
 
 const ChartListSettings = observer(() => {
   const navigate = useNavigate();
   const { sectionId } = useParams<{ sectionId: string }>();
-  const block = sectionId || 'production';
+  const block = (sectionId as BlockType) || 'production';
 
   const [cards, setCards] = useState<CardType[]>([]);
 
   useEffect(() => {
-    diagramStore.fetchDashboardData(block as any);
+    diagramStore.fetchDashboardData(block);
   }, [block]);
 
   useEffect(() => {
@@ -49,10 +41,7 @@ const ChartListSettings = observer(() => {
               title: { text: chart.title },
               chartType: chart.chartType,
               mapping: chart.mapping,
-              uiConfig: {
-                ...chart.uiConfig,
-                color: chart.uiConfig?.color || SECTION_COLORS[block],
-              },
+              uiConfig: chart.uiConfig,
             },
           };
         })
@@ -69,21 +58,11 @@ const ChartListSettings = observer(() => {
   };
 
   const handleSave = async () => {
-    const rawDiagrams = toJS(diagramStore.diagrams);
-
     const promises = cards.map((card, index) => {
       if (card.order !== index && card.diagramId) {
-        const originalDiag = rawDiagrams.find((d) => d.id === card.diagramId);
-
-        if (originalDiag) {
-          return diagramStore.updateDiagram(card.diagramId, {
-            block: originalDiag.block,
-            unit_id: originalDiag.unit_id,
-            columns: originalDiag.columns,
-            rows: originalDiag.rows,
-            order: index,
-          });
-        }
+        return diagramStore.updateDiagram(card.diagramId, {
+          order: index,
+        });
       }
       return null;
     });

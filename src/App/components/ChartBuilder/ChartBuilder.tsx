@@ -20,14 +20,6 @@ import 'react-data-grid/lib/styles.css';
 import styles from './ChartBuilder.module.scss';
 import ChartConfigMenu from './components/ChartConfigMenu';
 
-const SECTION_COLORS: Record<string, string> = {
-  production: '#FADB14',
-  economy: '#52C41A',
-  safety: '#FF4D4F',
-  quality: '#002766',
-  culture: '#40A9FF',
-};
-
 type ChartBuilderProps = {
   initialColumns?: BaseColumn[];
   initialRows?: RowData[];
@@ -60,7 +52,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
       yAxis: initialColumns.length > 1 ? initialColumns[1].key : '',
     },
     uiConfig: {
-      color: SECTION_COLORS[currentBlock],
+      color: '#5470c6',
     },
   });
 
@@ -105,7 +97,7 @@ const ChartBuilder = observer(({ initialColumns = [], initialRows = [] }: ChartB
             mapping: chart.mapping,
             uiConfig: {
               ...chart.uiConfig,
-              color: chart.uiConfig?.color || SECTION_COLORS[currentBlock],
+              color: chart.uiConfig?.color,
             },
           });
         }

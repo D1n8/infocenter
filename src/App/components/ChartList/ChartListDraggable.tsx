@@ -29,7 +29,7 @@ function ChartListDraggable({ isMaximize, cards, setCards }: ChartListType) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (setCards && over && active.id !== over.id) {
       setCards((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);

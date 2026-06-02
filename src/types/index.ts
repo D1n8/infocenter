@@ -56,7 +56,7 @@ export type CardType = {
 
 export type ChartListType = {
   cards: CardType[];
-  setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+  setCards?: React.Dispatch<React.SetStateAction<CardType[]>>;
   isMaximize?: boolean;
   limit?: string;
 };

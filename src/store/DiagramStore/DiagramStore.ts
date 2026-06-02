@@ -149,7 +149,7 @@ export default class DiagramStore {
     this._isLoading = true;
     this._error = '';
     try {
-      const response = await api.put<DatasetResponse>(`/diagrams/${diagramId}`, data);
+      const response = await api.patch<DatasetResponse>(`/diagrams/${diagramId}`, data);
       runInAction(() => {
         this._diagrams = this._diagrams.map((d) => (d.id === diagramId ? response.data : d));
         if (this._currentDiagram?.id === diagramId) {
@@ -235,7 +235,7 @@ export default class DiagramStore {
     this._isLoading = true;
     this._error = '';
     try {
-      const response = await api.put<ChartResponse>(`/charts/${chartId}`, data);
+      const response = await api.patch<ChartResponse>(`/charts/${chartId}`, data);
       runInAction(() => {
         this._charts = this._charts.map((c) => (c.id === chartId ? response.data : c));
       });
