@@ -9,6 +9,7 @@ import type {
   ActionType,
 } from 'types/index';
 
+import type NotificationStore from '../NotificationStore';
 import {
   normalizeUserType,
   type UserType,
@@ -27,6 +28,7 @@ type PrivateFields =
   | '_myPermissions';
 
 export default class UserStore {
+  private notificationStore: NotificationStore;
   private _error = '';
   private _isLoading = false;
   private _user: UserTypeModel | null = null;
@@ -39,7 +41,9 @@ export default class UserStore {
 
   private _myPermissions: UserPermissionsType = [];
 
-  constructor() {
+  constructor(notificationStore: NotificationStore) {
+    this.notificationStore = notificationStore;
+
     makeObservable<UserStore, PrivateFields>(this, {
       _error: observable,
       _isLoading: observable,
@@ -136,6 +140,10 @@ export default class UserStore {
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
+      if (response.data.notifications && Array.isArray(response.data.notifications)) {
+        this.notificationStore.setInitialNotifications(response.data.notifications);
+      }
+
       const userResponse = await api.get('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
@@ -145,6 +153,8 @@ export default class UserStore {
         this._user = normalizeUserType(userResponse.data);
         this._myPermissions = permsResponse.data;
       });
+
+      this.notificationStore.connect();
     } catch {
       runInAction(() => {
         this._error = 'Не удалось авторизоваться';
@@ -173,6 +183,10 @@ export default class UserStore {
         this._user = normalizeUserType(userResponse.data);
         this._myPermissions = permsResponse.data;
       });
+
+      await this.notificationStore.fetchAllNotifications();
+      await this.notificationStore.fetchPendingNotifications();
+      this.notificationStore.connect();
     } catch {
       this.logout();
     } finally {
@@ -240,6 +254,7 @@ export default class UserStore {
   logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    this.notificationStore.disconnect();
     runInAction(() => {
       this._user = null;
       this._myPermissions = [];
@@ -407,5 +422,3 @@ export default class UserStore {
     }
   }
 }
-
-export const userStore = new UserStore();
