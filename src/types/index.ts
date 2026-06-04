@@ -102,3 +102,17 @@ export type UnitTreeItem = {
   level: LevelType;
   children?: UnitTreeItem[];
 };
+
+export type NotificationType = {
+  id: string;
+  type: string;
+  recipient_id: string;
+  actor_id: string;
+  diagram_id: string;
+  message: string;
+  data: {
+    diagram_id: string;
+  };
+  timestamp: string;
+  delivered_at: string | null;
+};

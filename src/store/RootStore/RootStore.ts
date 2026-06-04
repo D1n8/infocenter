@@ -1,16 +1,21 @@
 import { createContext, useContext } from 'react';
 
+import DiagramStore from '../DiagramStore';
+import NotificationStore from '../NotificationStore';
 import UserStore from '../UserStore';
 
-class RootStore {
+export class RootStore {
   userStore: UserStore;
+  diagramStore: DiagramStore;
+  notificationStore: NotificationStore;
 
   constructor() {
-    this.userStore = new UserStore();
+    this.diagramStore = new DiagramStore();
+    this.notificationStore = new NotificationStore();
+    this.userStore = new UserStore(this.notificationStore);
   }
 }
 
 const rootStore = new RootStore();
-const RootStoreContext = createContext(rootStore);
-
+export const RootStoreContext = createContext(rootStore);
 export const useRootStore = () => useContext(RootStoreContext);
