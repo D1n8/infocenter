@@ -45,3 +45,10 @@
   cursor: pointer;
   background: white;
 }
+
+.rulesSection {
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

@@ -19,11 +19,20 @@ export type ChartTypeAlias =
   | 'candlestick'
   | 'cumulative_plan_fact';
 
+export type RuleOperator = '>' | '<' | '>=' | '<=' | '==' | '!=';
+
+export type ChartRule = {
+  operator: RuleOperator;
+  value: number;
+  color: string;
+};
+
 export type UIConfig = {
   color?: string;
   colorPalette?: string[];
   isDonut?: boolean;
   showLegend?: boolean;
+  rules?: ChartRule[];
 };
 
 export type ChartConfig = {
