@@ -10,16 +10,15 @@ import type {
   FunnelSeriesOption,
   TreemapSeriesOption,
 } from 'echarts';
-import type { RowData, ChartConfig } from 'types/index';
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
+import type { RowData, ChartConfig, ChartRule } from 'types/index';
+
+type StyledDataPoint = number | { value: number; itemStyle: { color: string } };
 
 type TooltipParam = {
   seriesName: string;
   value: number;
   axisValue: string;
-};
-
-type FormatterParams = {
-  value: [number, number, string];
 };
 
 export function transformDataForECharts(data: RowData[], config: ChartConfig): EChartsOption {
@@ -33,22 +32,44 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
 
   if (chartType === 'scatter') {
     if (!mapping.xAxis || !mapping.yAxis) return {};
+
+    // Типизируем массив данных как возможные объекты или вложенные массивы
     const scatterData = data
       .map((row) => {
         const x = Number(row[mapping.xAxis]);
         const y = Number(row[mapping.yAxis]);
         const name = mapping.name ? String(row[mapping.name]) : '';
-        return !isNaN(x) && !isNaN(y) ? [x, y, name] : null;
+
+        if (isNaN(x) || isNaN(y)) return null;
+
+        const processedY = applyRules(y, config.uiConfig?.rules);
+
+        if (typeof processedY === 'object') {
+          return {
+            value: [x, y, name],
+            itemStyle: processedY.itemStyle,
+          };
+        }
+
+        return [x, y, name];
       })
-      .filter((item): item is [number, number, string] => item !== null);
+      .filter((item) => item !== null);
 
     return {
       ...baseOption,
       tooltip: {
         trigger: 'item',
-        formatter: (params) => {
-          const p = params as unknown as FormatterParams;
-          const [x, y, pointName] = p.value;
+        // Строго типизируем коллбэк для всплывающей подсказки
+        formatter: (params: CallbackDataParams | CallbackDataParams[]) => {
+          // У scatter всегда trigger: 'item', значит params - это не массив
+          const p = Array.isArray(params) ? params[0] : params;
+
+          // ECharts сам извлекает [x, y, name] в p.value
+          const val = p.value as [number, number, string];
+          const x = val[0];
+          const y = val[1];
+          const pointName = val[2];
+
           const nameHtml = pointName ? `<b>${pointName}</b><br/>` : '';
           return `${nameHtml}X: ${x}<br/>Y: ${y}`;
         },
@@ -58,17 +79,17 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
       series: [
         {
           type: 'scatter',
-          data: scatterData,
+          data: scatterData as ScatterSeriesOption['data'], // Используем встроенный тип ECharts
           itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           label: {
             show: !!mapping.name,
-            formatter: (params) => {
-              const p = params as unknown as FormatterParams;
-              return p.value[2] || '';
+            formatter: (params: CallbackDataParams) => {
+              const val = params.value as [number, number, string];
+              return val[2] || '';
             },
             position: 'right',
           },
-        } as ScatterSeriesOption,
+        },
       ],
     };
   }
@@ -233,6 +254,8 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
     const categories = Object.keys(grouped);
     const values = Object.values(grouped);
 
+    const dataWithRules = values.map((v) => applyRules(v, config.uiConfig?.rules));
+
     if (chartType === 'bar' || chartType === 'horizontal_bar') {
       return {
         ...baseOption,
@@ -241,7 +264,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         series: [
           {
             type: 'bar',
-            data: values,
+            data: dataWithRules,
             itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           } as BarSeriesOption,
         ],
@@ -255,7 +278,7 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         series: [
           {
             type: 'line',
-            data: values,
+            data: dataWithRules,
             itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
             lineStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           } as LineSeriesOption,
@@ -263,6 +286,16 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
       };
     }
     if (chartType === 'pie') {
+      const pieData = categories.map((cat) => {
+        const val = grouped[cat];
+        const processed = applyRules(val, config.uiConfig?.rules);
+
+        if (typeof processed === 'object') {
+          return { name: cat, value: processed.value, itemStyle: processed.itemStyle };
+        }
+        return { name: cat, value: processed };
+      });
+
       return {
         ...baseOption,
         tooltip: { trigger: 'item' },
@@ -270,11 +303,12 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
           {
             type: 'pie',
             radius: '50%',
-            data: categories.map((cat) => ({ name: cat, value: grouped[cat] })),
+            data: pieData,
           } as PieSeriesOption,
         ],
       };
     }
+
     if (chartType === 'polar') {
       return {
         ...baseOption,
@@ -284,23 +318,39 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
         series: [
           {
             type: 'bar',
-            data: values,
+            data: dataWithRules,
             coordinateSystem: 'polar',
             itemStyle: uiConfig?.color ? { color: uiConfig.color } : undefined,
           } as BarSeriesOption,
         ],
       };
     }
+
     if (chartType === 'funnel') {
-      const funnelData = categories.map((cat) => ({ name: cat, value: grouped[cat] }));
+      const funnelData = categories.map((cat) => {
+        const val = grouped[cat];
+        const processed = applyRules(val, config.uiConfig?.rules);
+        if (typeof processed === 'object')
+          return { name: cat, value: processed.value, itemStyle: processed.itemStyle };
+        return { name: cat, value: processed };
+      });
+
       return {
         ...baseOption,
         tooltip: { trigger: 'item' },
         series: [{ type: 'funnel', data: funnelData } as FunnelSeriesOption],
       };
     }
+
     if (chartType === 'treemap') {
-      const treeData = categories.map((cat) => ({ name: cat, value: grouped[cat] }));
+      const treeData = categories.map((cat) => {
+        const val = grouped[cat];
+        const processed = applyRules(val, config.uiConfig?.rules);
+        if (typeof processed === 'object')
+          return { name: cat, value: processed.value, itemStyle: processed.itemStyle };
+        return { name: cat, value: processed };
+      });
+
       return {
         ...baseOption,
         tooltip: { trigger: 'item' },
@@ -358,13 +408,22 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
     const isStacked = chartType === 'stacked_bar' || chartType === 'stacked_line';
     const seriesType = chartType === 'stacked_bar' ? 'bar' : 'line';
 
-    const series = splitCategories.map((s): BarSeriesOption | LineSeriesOption => ({
-      name: s,
-      type: seriesType as 'bar' | 'line',
-      stack: isStacked ? 'total' : undefined,
-      areaStyle: chartType === 'stacked_line' ? {} : undefined,
-      data: xCategories.map((x) => pivotData[s][x] || 0),
-    }));
+    const series = splitCategories.map((s): BarSeriesOption | LineSeriesOption => {
+      const dataPoints = xCategories.map((xCat) => {
+        const val = pivotData[s][xCat] || 0;
+        return applyRules(val, config.uiConfig?.rules);
+      });
+
+      const safeData = dataPoints as unknown as (number | { name?: string; value: number })[];
+
+      return {
+        name: s,
+        type: seriesType as 'bar' | 'line',
+        stack: isStacked ? 'total' : undefined,
+        areaStyle: chartType === 'stacked_line' ? {} : undefined,
+        data: safeData,
+      };
+    });
 
     return {
       ...baseOption,
@@ -379,8 +438,12 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
     const { xAxis, open, close, lowest, highest } = mapping;
     if (!xAxis || !open || !close || !lowest || !highest) return {};
 
+    type CandleDataItem =
+      | [number, number, number, number]
+      | { value: [number, number, number, number]; itemStyle: { color: string } };
+
     const dates: string[] = [];
-    const candleValues: number[][] = [];
+    const candleValues: CandleDataItem[] = [];
 
     data.forEach((row) => {
       const dateVal = String(row[xAxis] || 'Неизвестно');
@@ -391,7 +454,17 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
 
       if (!isNaN(o) && !isNaN(c) && !isNaN(l) && !isNaN(h)) {
         dates.push(dateVal);
-        candleValues.push([o, c, l, h]);
+
+        const processedClose = applyRules(c, config.uiConfig?.rules);
+
+        if (typeof processedClose === 'object') {
+          candleValues.push({
+            value: [o, c, l, h],
+            itemStyle: processedClose.itemStyle,
+          });
+        } else {
+          candleValues.push([o, c, l, h]);
+        }
       }
     });
 
@@ -403,11 +476,48 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
       series: [
         {
           type: 'candlestick',
-          data: candleValues,
+          data: candleValues as unknown as (number | string | { value: (number | string)[] })[],
         } as CandlestickSeriesOption,
       ],
     };
   }
 
   return {};
+}
+
+function applyRules(val: number, rules?: ChartRule[]): StyledDataPoint {
+  if (!rules || rules.length === 0) return val;
+
+  for (const rule of rules) {
+    let isMatch = false;
+    switch (rule.operator) {
+      case '>':
+        isMatch = val > rule.value;
+        break;
+      case '<':
+        isMatch = val < rule.value;
+        break;
+      case '>=':
+        isMatch = val >= rule.value;
+        break;
+      case '<=':
+        isMatch = val <= rule.value;
+        break;
+      case '==':
+        isMatch = val === rule.value;
+        break;
+      case '!=':
+        isMatch = val !== rule.value;
+        break;
+    }
+
+    if (isMatch) {
+      return {
+        value: val,
+        itemStyle: { color: rule.color },
+      };
+    }
+  }
+
+  return val; // Если ни одно правило не подошло, возвращаем обычное число
 }
