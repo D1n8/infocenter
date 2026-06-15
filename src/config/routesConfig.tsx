@@ -4,6 +4,7 @@ import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
 import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
+import OrganizationalDocuments from 'App/pages/OrganizationalDocuments';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
@@ -55,6 +56,10 @@ export const routesConfig: RouteObject[] = [
               {
                 index: true,
                 element: <Navigate to={routes.operationalManagement.create()} replace />,
+              },
+              {
+                path: routes.organizationaDocuments.mask,
+                element: <OrganizationalDocuments />,
               },
               {
                 path: routes.operationalManagement.mask,
