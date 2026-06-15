@@ -8,7 +8,14 @@ function Navigation() {
   return (
     <nav>
       <ul className={styles.nav}>
-        <li className={styles.navItem}>Организационные документы</li>
+        <li>
+          <NavLink
+            to={routes.organizationaDocuments.create()}
+            className={({ isActive }) => classNames(styles.navItem, isActive && styles.isSelected)}
+          >
+            Организационные документы
+          </NavLink>
+        </li>
         <li className={styles.navItem}>Стратегия</li>
         <li>
           <NavLink

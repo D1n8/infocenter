@@ -7,6 +7,7 @@ import type {
   UnitTreeItem,
   BlockType,
   ActionType,
+  DocumentPermissionResponseSchema,
 } from 'types/index';
 
 import type NotificationStore from '../NotificationStore';
@@ -25,7 +26,9 @@ type PrivateFields =
   | '_managedPermissions'
   | '_usersList'
   | '_unitsTree'
-  | '_myPermissions';
+  | '_myPermissions'
+  | '_canManageDocuments'
+  | '_managedDocPermission';
 
 export default class UserStore {
   private notificationStore: NotificationStore;
@@ -40,6 +43,8 @@ export default class UserStore {
   private _managedPermissions: UserPermissionsType | null = null;
 
   private _myPermissions: UserPermissionsType = [];
+  private _canManageDocuments = false;
+  private _managedDocPermission = false;
 
   constructor(notificationStore: NotificationStore) {
     this.notificationStore = notificationStore;
@@ -53,6 +58,8 @@ export default class UserStore {
       _managedUser: observable,
       _managedPermissions: observable,
       _myPermissions: observable,
+      _canManageDocuments: observable,
+      _managedDocPermission: observable,
 
       isAuth: computed,
       error: computed,
@@ -64,6 +71,8 @@ export default class UserStore {
       unitsTree: computed,
       myPermissions: computed,
       canManagePermissions: computed,
+      canManageDocuments: computed,
+      managedDocPermission: computed,
     });
   }
 
@@ -109,6 +118,15 @@ export default class UserStore {
     return this._myPermissions.some((p) => p.action === 'manage_permissions');
   }
 
+  get canManageDocuments(): boolean {
+    if (this._user?.role === 'admin') return true;
+    return this._canManageDocuments;
+  }
+
+  get managedDocPermission(): boolean {
+    return this._managedDocPermission;
+  }
+
   hasBlockAccess(block: BlockType, action: ActionType = 'view'): boolean {
     const userRole = this._user?.role.toLowerCase();
     if (userRole === 'admin') return true;
@@ -130,28 +148,23 @@ export default class UserStore {
   async loginUser(login: string, password: string) {
     this._error = '';
     this._isLoading = true;
-
     try {
-      const response = await api.post('/auth/login', {
-        login: login,
-        password: password,
-      });
-
+      const response = await api.post('/auth/login', { login, password });
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
-
-      if (response.data.notifications && Array.isArray(response.data.notifications)) {
-        this.notificationStore.setInitialNotifications(response.data.notifications);
-      }
 
       const userResponse = await api.get('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
       );
 
+      const docPermsResponse =
+        await api.get<DocumentPermissionResponseSchema>('/permissions/documents');
+
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
         this._myPermissions = permsResponse.data;
+        this._canManageDocuments = docPermsResponse.data.can_upload_documents;
       });
 
       this.notificationStore.connect();
@@ -167,25 +180,23 @@ export default class UserStore {
   }
 
   async checkAuth() {
-    if (!localStorage.getItem('access_token')) {
-      return;
-    }
-
+    if (!localStorage.getItem('access_token')) return;
     this._isLoading = true;
-
     try {
       const userResponse = await api.get('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
       );
 
+      const docPermsResponse =
+        await api.get<DocumentPermissionResponseSchema>('/permissions/documents');
+
       runInAction(() => {
         this._user = normalizeUserType(userResponse.data);
         this._myPermissions = permsResponse.data;
+        this._canManageDocuments = docPermsResponse.data.can_upload_documents;
       });
 
-      await this.notificationStore.fetchAllNotifications();
-      await this.notificationStore.fetchPendingNotifications();
       this.notificationStore.connect();
     } catch {
       this.logout();
@@ -265,9 +276,10 @@ export default class UserStore {
     this._isLoading = true;
     this._error = '';
 
-    const [userResult, permissionsResult] = await Promise.allSettled([
+    const [userResult, permissionsResult, docPermsResult] = await Promise.allSettled([
       api.get<UserTypeApi>(`/users/${userId}`),
       api.get<UserPermissionsType>(`/permissions/users/${userId}`),
+      api.get<DocumentPermissionResponseSchema>(`/permissions/documents/${userId}`),
     ]);
 
     runInAction(() => {
@@ -283,6 +295,12 @@ export default class UserStore {
         this._managedPermissions = [];
       }
 
+      if (docPermsResult.status === 'fulfilled') {
+        this._managedDocPermission = docPermsResult.value.data.can_upload_documents;
+      } else {
+        this._managedDocPermission = false;
+      }
+
       this._isLoading = false;
     });
   }
@@ -291,6 +309,7 @@ export default class UserStore {
     runInAction(() => {
       this._managedUser = null;
       this._managedPermissions = null;
+      this._managedDocPermission = false;
       this._error = '';
     });
   }
@@ -414,6 +433,28 @@ export default class UserStore {
     } catch {
       runInAction(() => {
         this._error = 'Не удалось отозвать права у пользователя';
+      });
+    } finally {
+      runInAction(() => {
+        this._isLoading = false;
+      });
+    }
+  }
+
+  async setDocumentPermission(userId: string, canUpload: boolean) {
+    this._isLoading = true;
+    this._error = '';
+    try {
+      const response = await api.post<DocumentPermissionResponseSchema>(
+        `/permissions/documents/${userId}`,
+        { can_upload_documents: canUpload }
+      );
+      runInAction(() => {
+        this._managedDocPermission = response.data.can_upload_documents;
+      });
+    } catch {
+      runInAction(() => {
+        this._error = 'Не удалось обновить права на документы';
       });
     } finally {
       runInAction(() => {

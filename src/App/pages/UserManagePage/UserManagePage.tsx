@@ -37,10 +37,7 @@ const UserManagePage = observer(() => {
   });
 
   const [selectedPermissions, setSelectedPermissions] = useState<PermissionGrantType[]>([]);
-  const [resetMessage, setResetMessage] = useState<{
-    text: string;
-    type: 'success' | 'error';
-  } | null>(null);
+  const [docPermission, setDocPermission] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -65,7 +62,8 @@ const UserManagePage = observer(() => {
     if (userStore.managedPermissions) {
       setSelectedPermissions(getFlatPermissions(userStore.managedPermissions));
     }
-  }, [userStore.managedUser, userStore.managedPermissions]);
+    setDocPermission(userStore.managedDocPermission);
+  }, [userStore.managedUser, userStore.managedPermissions, userStore.managedDocPermission]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +91,7 @@ const UserManagePage = observer(() => {
         )
     );
 
-    const promises: Promise<void>[] = [
+    const promises: Promise<unknown>[] = [
       userStore.updateUser(id, {
         login: formData.login,
         email: formData.email,
@@ -110,26 +108,12 @@ const UserManagePage = observer(() => {
       promises.push(userStore.revokePermissions(id, { permissions: toRevoke }));
     }
 
+    if (docPermission !== userStore.managedDocPermission) {
+      promises.push(userStore.setDocumentPermission(id, docPermission));
+    }
+
     await Promise.all(promises);
     navigate(routes.adminUsersList.create());
-  };
-
-  const handleResetPassword = async () => {
-    if (!id) return;
-
-    const confirmReset = window.confirm(
-      'Вы уверены, что хотите сбросить пароль этого пользователя? Новый пароль будет отправлен ему на почту.'
-    );
-    if (!confirmReset) return;
-
-    setResetMessage(null);
-    const successMessage = await userStore.resetUserPassword(id);
-
-    if (successMessage) {
-      setResetMessage({ text: successMessage, type: 'success' });
-    } else {
-      setResetMessage({ text: userStore.error, type: 'error' });
-    }
   };
 
   if (userStore.isLoading && !userStore.managedUser) {
@@ -172,6 +156,34 @@ const UserManagePage = observer(() => {
             />
           </div>
 
+          <div
+            style={{
+              marginBottom: '24px',
+              padding: '16px',
+              background: '#fafafa',
+              borderRadius: '8px',
+              border: '1px solid #f0f0f0',
+            }}
+          >
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                fontWeight: 500,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={docPermission}
+                onChange={(e) => setDocPermission(e.target.checked)}
+                style={{ width: '16px', height: '16px' }}
+              />
+              Разрешить загрузку и удаление документов
+            </label>
+          </div>
+
           <div className={styles.permissions}>
             <h3 className={styles.permissionsTitle}>Настройка прав доступа</h3>
             <PermissionsTree
@@ -181,43 +193,14 @@ const UserManagePage = observer(() => {
             />
           </div>
 
-          {resetMessage && (
-            <div
-              style={{
-                color: resetMessage.type === 'success' ? '#52c41a' : '#ff4d4f',
-                fontSize: '14px',
-                marginBottom: '16px',
-              }}
-            >
-              {resetMessage.text}
-            </div>
-          )}
-
           <div className={layoutStyles.bottomContainer}>
-            <div
-              className={layoutStyles.btnContainer}
-              style={{ width: '100%', justifyContent: 'space-between' }}
-            >
-              <Button
-                type="button"
-                onClick={handleResetPassword}
-                disabled={userStore.isLoading}
-                style={{ backgroundColor: '#fff', color: '#ff4d4f', border: '1px solid #ff4d4f' }}
-              >
-                Сбросить пароль
+            <div className={layoutStyles.btnContainer}>
+              <Button type="button" className={layoutStyles.cancelBtn} onClick={() => navigate(-1)}>
+                Отменить
               </Button>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <Button
-                  type="button"
-                  className={layoutStyles.cancelBtn}
-                  onClick={() => navigate(-1)}
-                >
-                  Отменить
-                </Button>
-                <Button type="submit" disabled={userStore.isLoading}>
-                  {userStore.isLoading ? 'Сохранение...' : 'Сохранить'}
-                </Button>
-              </div>
+              <Button type="submit" disabled={userStore.isLoading}>
+                {userStore.isLoading ? 'Сохранение...' : 'Сохранить'}
+              </Button>
             </div>
           </div>
         </form>

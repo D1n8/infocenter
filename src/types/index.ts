@@ -125,3 +125,12 @@ export type NotificationType = {
   timestamp: string;
   delivered_at: string | null;
 };
+
+export type DocumentPermissionResponseSchema = {
+  user_id: string;
+  can_upload_documents: boolean;
+};
+
+export type DocumentPermissionUpdateSchema = {
+  can_upload_documents: boolean;
+};

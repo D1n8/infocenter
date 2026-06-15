@@ -27,6 +27,10 @@ export const routes = {
     mask: 'user-create',
     create: () => '/settings/user-create',
   },
+  organizationaDocuments: {
+    mask: 'organizational-documents',
+    create: () => '/organizational-documents',
+  },
   chartListSettings: {
     mask: '/operational-management/chart-list-settings/:sectionId',
     create: (sectionId: string) => `/operational-management/chart-list-settings/${sectionId}`,
