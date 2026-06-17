@@ -1,13 +1,33 @@
-import { routesConfig } from "./config/routesConfig";
-import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router";
-import 'config/configureMobX'
-import 'styles/index.scss'
+import { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-const router = createBrowserRouter(routesConfig);
+import { routesConfig } from './config/routesConfig';
+import { useRootStore } from './store/RootStore/RootStore';
+import 'config/configureMobX';
+import 'styles/index.scss';
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLDivElement
-);
+const router = createBrowserRouter(routesConfig, {
+  basename: import.meta.env.BASE_URL,
+});
 
-root.render(<RouterProvider router={router} />);
+function RootApp() {
+  const { userStore } = useRootStore();
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    userStore.checkAuth().finally(() => {
+      setIsInitializing(false);
+    });
+  }, [userStore]);
+
+  if (isInitializing) {
+    return null;
+  }
+
+  return <RouterProvider router={router} />;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLDivElement);
+
+root.render(<RootApp />);

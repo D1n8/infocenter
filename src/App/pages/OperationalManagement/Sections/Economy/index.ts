@@ -1,1 +1,1 @@
-export { default } from './Economy'
+export { default } from './Economy';

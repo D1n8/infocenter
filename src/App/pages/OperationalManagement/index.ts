@@ -1,1 +1,1 @@
-export { default } from './OperationalManagement'
+export { default } from './OperationalManagement';

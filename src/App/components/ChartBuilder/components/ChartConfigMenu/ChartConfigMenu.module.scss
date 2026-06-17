@@ -1,0 +1,54 @@
+.menu {
+  flex-grow: 1;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+}
+
+.menuContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 370px;
+}
+
+.inputContainer {
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dynamicFields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input {
+  padding-block: 8px;
+  font-size: 14px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--secondary);
+  line-height: 1.5;
+}
+
+.colorPicker {
+  height: 42px;
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+  background: white;
+}
+
+.rulesSection {
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

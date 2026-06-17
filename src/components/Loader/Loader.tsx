@@ -1,7 +1,5 @@
 function Loader() {
-    return ( 
-        <div>loader</div>
-     );
+  return <div>loader</div>;
 }
 
 export default Loader;

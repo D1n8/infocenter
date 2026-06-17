@@ -1,0 +1,120 @@
+.treeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.treeNode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+  }
+}
+
+.expandIcon {
+  font-size: 10px;
+  color: #bfbfbf;
+  width: 12px;
+  display: inline-block;
+  text-align: center;
+}
+
+.nodeName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.nodeContent {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-top: none;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  margin-top: -6px;
+}
+
+.permissionsMatrix {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blockRow {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.blockName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #595959;
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.actionsGroup {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #262626;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    accent-color: #1890ff;
+    margin: 0;
+  }
+}
+
+.childrenContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 20px;
+  border-left: 1px dashed #d9d9d9;
+  margin-left: 16px;
+  margin-top: 4px;
+}

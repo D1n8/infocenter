@@ -1,22 +1,132 @@
+import ChartList from 'App/components/ChartList/ChartList';
+import classNames from 'classnames';
 import Button from 'components/Button';
-import styles from './Section.module.scss'
+import ChartListSkeleton from 'components/ChartListSkeleton/ChartListSkeleton';
+import Dropdown from 'components/Dropdown';
+import type { DropdownOption } from 'components/Dropdown/Dropdown';
+import MaximizeButton from 'components/IconButtons/MaximizeButton';
+import MinimizeButton from 'components/IconButtons/MinimizeButton';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState, useMemo } from 'react';
+import { diagramStore } from 'store/DiagramStore';
+import { useRootStore } from 'store/RootStore/RootStore';
+import type { CardType, BlockType } from 'types/index';
 
-type SectionType = {
-    title?: string;
-    children?: React.ReactNode;
-    onClick?: () => void;
-}
+import styles from './Section.module.scss';
 
-function Section({title, children, onClick}: SectionType) {
-    return ( 
-        <section className={styles.section}>
-            <div className={styles.topContainer}>
-                <h2 className={styles.title}>{title}</h2>
-                <Button onClick={onClick} children={'Загрузить данные'}/>
-            </div>
-            {children}
-        </section>
-     );
-}
+const LIMIT_OPTIONS: DropdownOption[] = [
+  { value: '6', label: 'Показать 6 графиков' },
+  { value: '9', label: 'Показать 9 графиков' },
+  { value: '12', label: 'Показать 12 графиков' },
+  { value: 'all', label: 'Показать все графики' },
+];
+
+type SectionProps = {
+  isMaximize: boolean;
+  setIsMaximize: (flag: boolean) => void;
+  title: string;
+  blockId: BlockType;
+  onClick: () => void;
+};
+
+const Section = observer(({ isMaximize, setIsMaximize, title, blockId, onClick }: SectionProps) => {
+  const { userStore } = useRootStore();
+  const [hasRenderedAll, setHasRenderedAll] = useState(isMaximize);
+  const [limit, setLimit] = useState<string>('6');
+
+  useEffect(() => {
+    if (isMaximize && !hasRenderedAll) {
+      setHasRenderedAll(true);
+    }
+  }, [isMaximize, hasRenderedAll]);
+
+  useEffect(() => {
+    if (!isMaximize) {
+      setLimit('6');
+    }
+  }, [isMaximize]);
+
+  const cards: CardType[] = useMemo(() => {
+    const rawCharts = toJS(diagramStore.charts);
+    const rawDiagrams = toJS(diagramStore.diagrams);
+
+    return rawCharts
+      .filter((chart) => rawDiagrams.some((d) => d.id === chart.diagramId && d.block === blockId))
+      .map((chart) => {
+        const diagram = rawDiagrams.find((d) => d.id === chart.diagramId);
+        return {
+          id: chart.id,
+          diagramId: chart.diagramId,
+          order: diagram ? (diagram.order ?? 0) : 0,
+          data: diagram ? diagram.rows : [],
+          config: {
+            title: { text: chart.title },
+            chartType: chart.chartType,
+            mapping: chart.mapping,
+            uiConfig: {
+              ...chart.uiConfig,
+              color: chart.uiConfig?.color,
+            },
+          },
+        };
+      })
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [diagramStore.charts, diagramStore.diagrams, blockId]);
+
+  useEffect(() => {
+    if (cards.length <= 3 && isMaximize) {
+      setIsMaximize(false);
+    }
+  }, [cards.length, isMaximize, setIsMaximize]);
+
+  const handleLimitChange = (opt: DropdownOption) => {
+    setLimit(String(opt.value));
+  };
+
+  const canManage = userStore.canManageBlock(blockId);
+  const hasMoreThanThree = cards.length > 3;
+
+  return (
+    <section className={styles.section}>
+      <div className={styles.topContainer}>
+        <div className={styles.titleContainer}>
+          <h2 className={styles.title}>{title}</h2>
+
+          {hasMoreThanThree &&
+            (isMaximize ? (
+              <MinimizeButton
+                onClick={() => setIsMaximize(false)}
+                className={classNames(styles.sizeBtn, styles.minBtn)}
+              />
+            ) : (
+              <MaximizeButton
+                onClick={() => setIsMaximize(true)}
+                className={classNames(styles.sizeBtn, styles.maxBtn)}
+              />
+            ))}
+
+          {isMaximize && hasMoreThanThree && (
+            <Dropdown
+              id={`limit-select-${title}`}
+              options={LIMIT_OPTIONS}
+              value={limit}
+              onChange={handleLimitChange}
+            />
+          )}
+        </div>
+        {canManage && <Button onClick={onClick} children={'Настроить графики'} />}
+      </div>
+
+      {diagramStore.isLoading ? (
+        <ChartListSkeleton />
+      ) : cards.length > 0 ? (
+        <ChartList isMaximize={isMaximize} cards={cards} limit={limit} />
+      ) : (
+        <div className={styles.emptyState}>В данном разделе пока нет графиков</div>
+      )}
+    </section>
+  );
+});
 
 export default Section;

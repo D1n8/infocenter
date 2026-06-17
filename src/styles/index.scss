@@ -1,20 +1,35 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    font-family: 'Inter', sans-serif;
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--main-bg);
 }
 
 :root {
-    --main-blue: #2382C5;
-    --main-white: #fff;
-    --main-text: #262626;
-    --secondary: #525252;
+  --rdg-color-scheme: light;
+  --main-bg: #fafafa;
+  --main-blue: #2382c5;
+  --main-blue-hover: #53a5e0;
+  --main-white: #fff;
+  --main-white-hover: #e4e4e4;
+  --main-text: #262626;
+  --secondary: #525252;
+  --gray-30: #d4d4d4;
+  --gray-70: #404040;
 }
 
-ul{
-    list-style-type: none;
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.rdg-cell {
+  padding-inline: 8px;
 }

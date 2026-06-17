@@ -1,16 +1,78 @@
-.section{
-
+.topContainer {
+  margin-bottom: 20px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.topContainer{
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.title{
-    font-size: 24px;
-    line-height: 1.66;
-    font-weight: normal;
+.title {
+  font-size: 24px;
+  line-height: 1.66;
+  font-weight: normal;
+}
+
+.sizeBtn {
+  transition: all 0.2s ease-in-out;
+}
+
+.maxBtn:hover {
+  transform: scale(1.15);
+}
+
+.minBtn:hover {
+  transform: scale(0.85);
+}
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  gap: 12px;
+  width: 100%;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loaderText {
+  font-size: 14px;
+  color: #8c8c8c;
+  font-weight: 400;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  background-color: #fafafa;
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  color: #8c8c8c;
+  font-size: 14px;
+  width: 100%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

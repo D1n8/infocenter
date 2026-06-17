@@ -1,7 +1,8 @@
-import Header from './components/Header'
-import styles from './App.module.scss'
-import { Outlet } from 'react-router'
-import { observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite';
+import { Outlet } from 'react-router';
+
+import styles from './App.module.scss';
+import Header from './components/Header';
 
 const App = observer(() => {
   return (
@@ -11,7 +12,7 @@ const App = observer(() => {
         <Outlet />
       </main>
     </div>
-  )
-})
+  );
+});
 
-export default App
+export default App;

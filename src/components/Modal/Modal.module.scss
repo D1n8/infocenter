@@ -1,0 +1,42 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(#000000, 0.15);
+  z-index: 1000;
+}
+
+.content {
+  position: relative;
+  border-radius: 8px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.large {
+  width: 95%;
+  height: 840px;
+  padding: 10px;
+}
+
+.small {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  padding: 24px;
+}
+
+.closeBtn {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 1001;
+}

@@ -1,1 +1,1 @@
-export { default } from './Safety'
+export { default } from './Safety';

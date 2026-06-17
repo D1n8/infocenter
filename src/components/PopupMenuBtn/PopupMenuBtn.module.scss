@@ -1,0 +1,25 @@
+.popupBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 15px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all ease 0.15s;
+
+  span {
+    font-size: 16px;
+    font-family: 'Inter';
+    color: var(--main-text);
+  }
+}
+
+.popupBtn:hover {
+  background-color: var(--gray-30);
+}
+
+.popupBtn:not(:last-child) {
+  border-bottom: 1px solid #e5e5e5;
+}
