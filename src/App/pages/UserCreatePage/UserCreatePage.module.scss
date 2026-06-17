@@ -10,11 +10,9 @@
 }
 
 .permissions {
-  margin-bottom: 20px;
-}
-
-.permissionsTitle {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .btnContainer {

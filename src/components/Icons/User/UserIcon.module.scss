@@ -1,0 +1,9 @@
+.userIcon {
+  path {
+    transition: stroke 0.2s ease;
+  }
+
+  &:hover path {
+    stroke: #61b3ff;
+  }
+}

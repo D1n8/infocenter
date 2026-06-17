@@ -1,7 +1,5 @@
 import classNames from 'classnames';
 import Button from 'components/Button';
-import Search from 'components/Icons/Search';
-import Input from 'components/Input';
 import PageTitle from 'components/PageTitle/PageTitle';
 import PermissionsTree from 'components/PermissionsTree/PermissionsTree';
 import { routes } from 'config/routes';
@@ -125,8 +123,6 @@ const UserManagePage = observer(() => {
       <PageTitle title="Редактирование пользователя" />
 
       <div className={layoutStyles.settingsContainer}>
-        <Input className={layoutStyles.settingsInput} icon={<Search />} placeholder="Поиск" />
-
         <form
           className={classNames(styles.form, layoutStyles.settingsMenu)}
           onSubmit={handleSubmit}
@@ -156,34 +152,6 @@ const UserManagePage = observer(() => {
             />
           </div>
 
-          <div
-            style={{
-              marginBottom: '24px',
-              padding: '16px',
-              background: '#fafafa',
-              borderRadius: '8px',
-              border: '1px solid #f0f0f0',
-            }}
-          >
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={docPermission}
-                onChange={(e) => setDocPermission(e.target.checked)}
-                style={{ width: '16px', height: '16px' }}
-              />
-              Разрешить загрузку и удаление документов
-            </label>
-          </div>
-
           <div className={styles.permissions}>
             <h3 className={styles.permissionsTitle}>Настройка прав доступа</h3>
             <PermissionsTree
@@ -191,6 +159,34 @@ const UserManagePage = observer(() => {
               selectedPermissions={selectedPermissions}
               onChange={setSelectedPermissions}
             />
+
+            <div
+              style={{
+                marginBottom: '24px',
+                padding: '16px',
+                background: '#fafafa',
+                borderRadius: '8px',
+                border: '1px solid #f0f0f0',
+              }}
+            >
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={docPermission}
+                  onChange={(e) => setDocPermission(e.target.checked)}
+                  style={{ width: '16px', height: '16px' }}
+                />
+                Разрешить загрузку и удаление документов
+              </label>
+            </div>
           </div>
 
           <div className={layoutStyles.bottomContainer}>

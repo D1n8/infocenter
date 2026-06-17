@@ -23,7 +23,6 @@
   display: flex;
   width: 320px;
   flex-direction: column;
-  gap: 20px;
 }
 
 .authBtn {
@@ -49,4 +48,53 @@
 
 .img {
   max-height: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  margin-bottom: 12px;
+}
+
+.errorText {
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  color: #ff4d4f;
+  font-size: 12px;
+  line-height: 1;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.serverErrorWrapper {
+  min-height: 40px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.serverError {
+  width: 100%;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
