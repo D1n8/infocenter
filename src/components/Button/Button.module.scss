@@ -1,14 +1,16 @@
-.btn{
-    padding: 8px 14px;
-    background-color: var(--main-blue);
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.5;
-    color: white;
-}
+.btn {
+  padding: 8px 14px;
+  background-color: var(--main-blue);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: white;
+  transition: all 0.2s ease-in-out;
 
-.btn:hover{
+  &:hover {
+    background-color: var(--main-blue-hover);
     cursor: pointer;
+  }
 }
