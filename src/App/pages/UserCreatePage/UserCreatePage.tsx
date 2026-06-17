@@ -29,7 +29,6 @@ const UserCreatePage = observer(() => {
 
   const [permissions, setPermissions] = useState<PermissionGrantType[]>([]);
 
-  // Стейты для ошибок
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
 
@@ -37,7 +36,6 @@ const UserCreatePage = observer(() => {
     userStore.fetchUnitsTree();
   }, [userStore]);
 
-  // Локальная валидация перед отправкой
   const validate = () => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
@@ -66,7 +64,6 @@ const UserCreatePage = observer(() => {
     return isValid;
   };
 
-  // Очистка ошибки при вводе
   const handleChange = (field: keyof UserType, value: string) => {
     setData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -92,17 +89,16 @@ const UserCreatePage = observer(() => {
         }
         navigate(routes.adminUsersList.create());
       } else {
-        // Если метод вернул null, но не выкинул ошибку (зависит от вашей реализации стора)
         setServerError(userStore.error || 'Не удалось создать пользователя');
       }
-    } catch (error: any) {
-      // Перехватываем ошибку от API (Axios)
-      const detail = error.response?.data?.detail;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: unknown } } };
+      const detail = err.response?.data?.detail;
 
       if (detail === 'Email already registered') {
         setServerError('Пользователь с такой почтой уже существует');
       } else if (typeof detail === 'string') {
-        setServerError(detail); // Выводим текст ошибки от бэкенда
+        setServerError(detail);
       } else {
         setServerError('Произошла ошибка при создании пользователя');
       }
@@ -195,7 +191,6 @@ const UserCreatePage = observer(() => {
             </div>
           )}
 
-          {/* Плашка с серверной ошибкой */}
           <div className={styles.serverErrorWrapper}>
             {serverError && <div className={styles.serverError}>{serverError}</div>}
           </div>
