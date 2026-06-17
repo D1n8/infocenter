@@ -20,3 +20,78 @@
   display: flex;
   justify-content: end;
 }
+
+.roleSection {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.roleTitle {
+  margin-bottom: 12px;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 24px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 16px;
+
+  input[type='radio'] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px; /* Место под ошибку, чтобы верстка не прыгала */
+}
+
+.errorText {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  color: #ff4d4f;
+  font-size: 12px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.serverErrorWrapper {
+  min-height: 40px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.serverError {
+  width: 100%;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
