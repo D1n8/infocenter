@@ -1,0 +1,77 @@
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+.modalTitle {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #262626;
+}
+
+.searchInput {
+  margin-bottom: 16px;
+}
+
+.chartListContainer {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chartItemLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #1890ff;
+}
+
+.chartInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chartTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.chartBlock {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.emptySearch {
+  text-align: center;
+  color: #8c8c8c;
+  padding: 20px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
