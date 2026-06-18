@@ -2,6 +2,7 @@ import App from 'App/index';
 import AuthPage from 'App/pages/Auth';
 import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
+import ChartsComparisonPage from 'App/pages/ChartsComparisonPage';
 import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
 import OrganizationalDocuments from 'App/pages/OrganizationalDocuments';
@@ -64,6 +65,10 @@ export const routesConfig: RouteObject[] = [
               {
                 path: routes.operationalManagement.mask,
                 element: <OperationalManagement />,
+              },
+              {
+                path: routes.chartsComparison.mask,
+                element: <ChartsComparisonPage />,
               },
               {
                 path: routes.chartListSettings.mask,
