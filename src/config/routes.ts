@@ -43,4 +43,8 @@ export const routes = {
     mask: 'operational-management',
     create: () => '/operational-management',
   },
+  chartsComparison: {
+    mask: '/operational-management/charts-comparison',
+    create: () => '/operational-management/charts-comparison',
+  },
 };
