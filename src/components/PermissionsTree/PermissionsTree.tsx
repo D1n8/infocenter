@@ -13,7 +13,7 @@ const BLOCKS: { value: BlockType | 'all'; label: string }[] = [
   { value: 'safety', label: 'Безопасность' },
   { value: 'quality', label: 'Качество' },
   { value: 'production', label: 'Производство' },
-  { value: 'economy', label: 'Затраты' },
+  { value: 'economy', label: 'Экономика' },
   { value: 'culture', label: 'Культура' },
   { value: 'all', label: 'Все блоки' },
 ];
