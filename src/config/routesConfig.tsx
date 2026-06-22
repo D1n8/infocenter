@@ -1,9 +1,9 @@
 import App from 'App/index';
 import AuthPage from 'App/pages/Auth';
+import BlockPage from 'App/pages/BlockPage';
 import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
 import ChartsComparisonPage from 'App/pages/ChartsComparisonPage';
-import Main from 'App/pages/Main';
 import OperationalManagement from 'App/pages/OperationalManagement';
 import OrganizationalDocuments from 'App/pages/OrganizationalDocuments';
 import Profile from 'App/pages/Profile';
@@ -25,6 +25,11 @@ export const routesConfig: RouteObject[] = [
         path: routes.main.mask,
         element: <App />,
         children: [
+          // Редирект с корня на дашборд (заменил index Main'а)
+          {
+            index: true,
+            element: <Navigate to={routes.operationalManagement.create()} replace />,
+          },
           {
             path: routes.settings.mask,
             element: <SettingsLayout />,
@@ -51,34 +56,30 @@ export const routesConfig: RouteObject[] = [
             path: routes.profile.mask,
             element: <Profile />,
           },
+          // Перенесли все страницы из Main напрямую в App
           {
-            element: <Main />,
-            children: [
-              {
-                index: true,
-                element: <Navigate to={routes.operationalManagement.create()} replace />,
-              },
-              {
-                path: routes.organizationaDocuments.mask,
-                element: <OrganizationalDocuments />,
-              },
-              {
-                path: routes.operationalManagement.mask,
-                element: <OperationalManagement />,
-              },
-              {
-                path: routes.chartsComparison.mask,
-                element: <ChartsComparisonPage />,
-              },
-              {
-                path: routes.chartListSettings.mask,
-                element: <ChartListSettings />,
-              },
-              {
-                path: routes.chartBuilder.mask,
-                element: <ChartBuilderPage />,
-              },
-            ],
+            path: routes.organizationaDocuments.mask,
+            element: <OrganizationalDocuments />,
+          },
+          {
+            path: routes.operationalManagement.mask,
+            element: <OperationalManagement />,
+          },
+          {
+            path: routes.dashboardBlock.mask,
+            element: <BlockPage />,
+          },
+          {
+            path: routes.chartsComparison.mask,
+            element: <ChartsComparisonPage />,
+          },
+          {
+            path: routes.chartListSettings.mask,
+            element: <ChartListSettings />,
+          },
+          {
+            path: routes.chartBuilder.mask,
+            element: <ChartBuilderPage />,
           },
           {
             path: '*',

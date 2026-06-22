@@ -21,7 +21,7 @@ export const routes = {
   },
   adminUserManage: {
     mask: 'user-manage/:id',
-    create: (id: string) => `/settings/user-manage/${id}`,
+    create: (id: string) => `settings/user-manage/${id}`,
   },
   adminCreateUser: {
     mask: 'user-create',
@@ -46,5 +46,9 @@ export const routes = {
   chartsComparison: {
     mask: '/operational-management/charts-comparison',
     create: () => '/operational-management/charts-comparison',
+  },
+  dashboardBlock: {
+    mask: '/operational-management/dashboard/:blockId',
+    create: (blockId: string) => `/operational-management/dashboard/${blockId}`,
   },
 };

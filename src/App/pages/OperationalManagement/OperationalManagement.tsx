@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { diagramStore } from 'store/DiagramStore';
 import { useRootStore } from 'store/RootStore/RootStore';
 
-import styles from './OperationalManagement.module.scss';
 import Culture from './Sections/Culture';
 import Economy from './Sections/Economy';
 import Production from './Sections/Production';
@@ -21,13 +20,13 @@ const OperationalManagement = observer(() => {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <>
       {userStore.hasBlockAccess('production') && <Production />}
       {userStore.hasBlockAccess('culture') && <Culture />}
       {userStore.hasBlockAccess('economy') && <Economy />}
       {userStore.hasBlockAccess('safety') && <Safety />}
       {userStore.hasBlockAccess('quality') && <Quality />}
-    </div>
+    </>
   );
 });
 

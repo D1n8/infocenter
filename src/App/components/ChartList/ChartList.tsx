@@ -4,14 +4,10 @@ import ChartCard from '../ChartCard/ChartCard';
 
 import styles from './ChartList.module.scss';
 
-function ChartList({ isMaximize, cards, limit = '6' }: ChartListType) {
-  const currentLimit = isMaximize ? (limit === 'all' ? cards.length : Number(limit)) : 3;
-
-  const renderedCards = cards.slice(0, currentLimit);
-
+function ChartList({ cards }: ChartListType) {
   return (
     <div className={styles.chartList}>
-      {renderedCards.map((card) => {
+      {cards.map((card) => {
         return (
           <ChartCard
             key={card.id}
