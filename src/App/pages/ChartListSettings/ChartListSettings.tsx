@@ -13,6 +13,14 @@ import type { CardType, BlockType } from 'types/index';
 
 import styles from './ChartListSettings.module.scss';
 
+const BLOCKS: Record<BlockType, string> = {
+  safety: 'Безопасность',
+  production: 'Производство',
+  quality: 'Качество',
+  economy: 'Экономика',
+  culture: 'Корпоративная культура',
+};
+
 const ChartListSettings = observer(() => {
   const navigate = useNavigate();
   const { sectionId } = useParams<{ sectionId: string }>();
@@ -75,7 +83,7 @@ const ChartListSettings = observer(() => {
   return (
     <div className={styles.chartListSettings}>
       <div className={styles.topContainer}>
-        <PageTitle title="Настройки" />
+        <PageTitle title={`Настройки блока "${BLOCKS[block]}"`} />
         <Button onClick={handleAddChartClick}>Добавить график</Button>
       </div>
 

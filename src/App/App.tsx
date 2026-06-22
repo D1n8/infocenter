@@ -3,14 +3,16 @@ import { Outlet } from 'react-router';
 
 import styles from './App.module.scss';
 import Header from './components/Header';
+import ScrollToTop from './components/Router/ScrollToTop';
 
 const App = observer(() => {
   return (
     <div className={styles.app}>
-      <Header />
+      <ScrollToTop />
       <main className={styles.main}>
         <Outlet />
       </main>
+      <Header />
     </div>
   );
 });

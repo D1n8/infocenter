@@ -1,6 +1,4 @@
 import classNames from 'classnames';
-import Search from 'components/Icons/Search';
-import Input from 'components/Input';
 import PageTitle from 'components/PageTitle';
 import { routes } from 'config/routes';
 import { observer } from 'mobx-react-lite';
@@ -17,12 +15,6 @@ const SettingsPage = observer(() => {
     <div>
       <PageTitle title="Настройки" />
       <div className={layoutStyles.settingsContainer}>
-        <Input
-          icon={<Search />}
-          placeholder="Поиск настроек"
-          className={layoutStyles.settingsInput}
-        />
-
         <section className={classNames(styles.settingsList, layoutStyles.settingsMenu)}>
           <SettingsItem>Пользовательские настройки</SettingsItem>
           <SettingsItem>Предприятия</SettingsItem>
