@@ -6,15 +6,83 @@
 
 .header {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.headerBtn {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+/* --- Стили для выпадающего меню заголовка --- */
+.titleContainer {
+  position: relative;
+  display: flex;
   align-items: center;
 }
 
+.titleDropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+
+  .arrow {
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:hover .title {
+    color: var(--secondary);
+  }
+}
+
 .title {
-  font-size: 20px;
+  font-size: 12px;
   line-height: 1.66;
   font-weight: normal;
+  margin: 0;
+  transition: color 0.2s ease;
 }
+
+.titleDropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.titleDropdownItem {
+  padding: 4px 6px;
+  font-size: 12px;
+  color: #262626;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.activeItem {
+    background-color: var(--main-white-hover);
+    font-weight: 500;
+  }
+}
+/* --------------------------------------------- */
 
 .grid {
   display: grid;
@@ -23,7 +91,6 @@
   width: 100%;
 }
 
-.loader,
 .empty {
   width: 100%;
   text-align: center;
@@ -31,6 +98,43 @@
   color: #8c8c8c;
   font-size: 16px;
   border-radius: 8px;
+  background-color: #fafafa;
+  border: 1px dashed #d9d9d9;
+}
+
+/* Стили для лоадера графиков */
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  gap: 12px;
+  width: 100%;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loaderText {
+  font-size: 14px;
+  color: #8c8c8c;
+  font-weight: 400;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .chartList {
@@ -44,10 +148,16 @@
   .chartList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
   .chartList {
+    grid-template-columns: 1fr;
+  }
+  .grid {
     grid-template-columns: 1fr;
   }
 }

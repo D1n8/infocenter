@@ -84,15 +84,6 @@ const Header = observer(() => {
 
                   {isDashboardHovered && (
                     <div className={styles.nestedMenu}>
-                      <NavLink
-                        to={routes.operationalManagement.create()}
-                        end
-                        className={({ isActive }) =>
-                          classNames(styles.dropdownItem, isActive && styles.activeDropdownItem)
-                        }
-                      >
-                        Все блоки
-                      </NavLink>
                       {BLOCKS.map(
                         (block) =>
                           userStore.hasBlockAccess(block.id) && (

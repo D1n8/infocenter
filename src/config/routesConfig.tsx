@@ -4,7 +4,7 @@ import BlockPage from 'App/pages/BlockPage';
 import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
 import ChartsComparisonPage from 'App/pages/ChartsComparisonPage';
-import OperationalManagement from 'App/pages/OperationalManagement';
+import DashboardMenu from 'App/pages/DashboardMenu/DashboardMenu'; // ИМПОРТ НОВОГО МЕНЮ
 import OrganizationalDocuments from 'App/pages/OrganizationalDocuments';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
@@ -25,7 +25,7 @@ export const routesConfig: RouteObject[] = [
         path: routes.main.mask,
         element: <App />,
         children: [
-          // Редирект с корня на дашборд (заменил index Main'а)
+          // Редирект с корня на дашборд
           {
             index: true,
             element: <Navigate to={routes.operationalManagement.create()} replace />,
@@ -56,15 +56,19 @@ export const routesConfig: RouteObject[] = [
             path: routes.profile.mask,
             element: <Profile />,
           },
-          // Перенесли все страницы из Main напрямую в App
           {
             path: routes.organizationaDocuments.mask,
             element: <OrganizationalDocuments />,
           },
+
+          // ==========================================
+          // ИЗМЕНЕНИЕ ЗДЕСЬ: Теперь по этому пути открывается меню из 5 плиток
           {
             path: routes.operationalManagement.mask,
-            element: <OperationalManagement />,
+            element: <DashboardMenu />,
           },
+          // ==========================================
+
           {
             path: routes.dashboardBlock.mask,
             element: <BlockPage />,
