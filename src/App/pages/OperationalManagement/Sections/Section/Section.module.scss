@@ -1,3 +1,4 @@
+/* Ваши текущие стили оставляем без изменений */
 .section {
   margin-bottom: 20px;
 }
@@ -14,6 +15,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  position: relative; /* ВАЖНО: нужно для абсолютного позиционирования меню */
 }
 
 .title {
@@ -34,31 +36,6 @@
   transform: scale(0.85);
 }
 
-.loaderContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 250px;
-  gap: 12px;
-  width: 100%;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #1890ff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.loaderText {
-  font-size: 14px;
-  color: #8c8c8c;
-  font-weight: 400;
-}
-
 .emptyState {
   display: flex;
   align-items: center;
@@ -72,11 +49,58 @@
   width: 100%;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+/* --- НОВЫЕ СТИЛИ ДЛЯ ВЫПАДАЮЩЕГО ЗАГОЛОВКА --- */
+
+.titleDropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+
+  .arrow {
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: rotate(180deg);
+    }
   }
-  100% {
-    transform: rotate(360deg);
+
+  &:hover .title {
+    color: var(--main-blue, #1890ff);
+  }
+}
+
+.titleDropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 12px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.titleDropdownItem {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #262626;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.activeItem {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    font-weight: 500;
   }
 }
