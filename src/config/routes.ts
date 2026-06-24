@@ -21,7 +21,7 @@ export const routes = {
   },
   adminUserManage: {
     mask: 'user-manage/:id',
-    create: (id: string) => `settings/user-manage/${id}`,
+    create: (id: string) => `/settings/user-manage/${id}`,
   },
   adminCreateUser: {
     mask: 'user-create',
