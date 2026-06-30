@@ -1,5 +1,6 @@
 import { formatBytes } from 'App/utils/formatBytes';
 import { formatDate } from 'App/utils/formatDate';
+import classNames from 'classnames';
 import Button from 'components/Button';
 import Search from 'components/Icons/Search';
 import Input from 'components/Input';
@@ -96,7 +97,7 @@ const OrganizationalDocuments = observer(() => {
                     <tr key={doc.id} className={styles.row}>
                       <td>
                         <button
-                          className={styles.downloadLink}
+                          className={classNames(styles.downloadLink, styles.ellipsis)}
                           onClick={() => documentsStore.downloadDoc(doc.id, doc.fileName)}
                         >
                           {doc.fileName}
@@ -163,8 +164,11 @@ const OrganizationalDocuments = observer(() => {
         <div style={{ textAlign: 'center' }}>
           <h3>Подтверждение удаления</h3>
           <p style={{ margin: '16px 0 24px', color: '#666' }}>
-            Вы уверены, что хотите удалить файл <b>"{docToDelete?.name}"</b>? Это действие нельзя
-            будет отменить.
+            Вы уверены, что хотите удалить файл{' '}
+            <p className={styles.ellipsis}>
+              <b>"{docToDelete?.name}"</b>
+            </p>
+            ? Это действие нельзя будет отменить.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
             <Button

@@ -73,6 +73,15 @@ const Header = observer(() => {
 
             {isOpManDropdownOpen && (
               <div className={styles.dropdownMenu}>
+                <NavLink
+                  to={routes.operationalManagement.create()}
+                  className={({ isActive }) =>
+                    classNames(styles.dropdownItem, isActive && styles.activeDropdownItem)
+                  }
+                >
+                  Главное меню
+                </NavLink>
+
                 <div
                   className={styles.nestedDropdownContainer}
                   onMouseEnter={() => setIsDashboardHovered(true)}
