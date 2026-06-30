@@ -16,8 +16,8 @@ const SettingsPage = observer(() => {
       <PageTitle title="Настройки" />
       <div className={layoutStyles.settingsContainer}>
         <section className={classNames(styles.settingsList, layoutStyles.settingsMenu)}>
-          <SettingsItem>Пользовательские настройки</SettingsItem>
-          <SettingsItem>Предприятия</SettingsItem>
+          {/* <SettingsItem>Пользовательские настройки</SettingsItem>
+          <SettingsItem>Предприятия</SettingsItem> */}
 
           {userStore.canManagePermissions && (
             <SettingsItem href={routes.adminUsersList.create()}>
@@ -26,7 +26,7 @@ const SettingsPage = observer(() => {
           )}
 
           {/* <SettingsItem>Управление ролями</SettingsItem> */}
-          <SettingsItem>Системные настройки</SettingsItem>
+          {/* <SettingsItem>Системные настройки</SettingsItem> */}
         </section>
       </div>
     </div>

@@ -303,6 +303,10 @@ export function transformDataForECharts(data: RowData[], config: ChartConfig): E
           {
             type: 'pie',
             radius: '50%',
+            itemStyle: {
+              borderColor: '#ffffff',
+              borderWidth: 2,
+            },
             data: pieData,
           } as PieSeriesOption,
         ],

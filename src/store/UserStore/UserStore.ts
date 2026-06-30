@@ -148,16 +148,22 @@ export default class UserStore {
   async loginUser(login: string, password: string) {
     this._error = '';
     this._isLoading = true;
+
     try {
-      const response = await api.post('/auth/login', { login, password });
+      // ИСПОЛЬЗУЕМ ЧИСТЫЙ AXIOS ДЛЯ ЛОГИНА (чтобы избежать интерцепторов)
+      const response = await api.post(`/auth/login`, {
+        login: login,
+        password: password,
+      });
+
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
-      const userResponse = await api.get('/users/me');
+      // После успешного логина запрашиваем профиль УЖЕ ЧЕРЕЗ API (с токенами)
+      const userResponse = await api.get<UserTypeApi>('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
       );
-
       const docPermsResponse =
         await api.get<DocumentPermissionResponseSchema>('/permissions/documents');
 
@@ -170,11 +176,11 @@ export default class UserStore {
       this.notificationStore.connect();
     } catch {
       runInAction(() => {
-        this._error = 'Не удалось авторизоваться';
+        this._error = 'Не удалось авторизоваться. Проверьте логин и пароль.';
       });
     } finally {
       runInAction(() => {
-        this._isLoading = false;
+        this._isLoading = false; // Теперь finally сработает на 100%
       });
     }
   }
