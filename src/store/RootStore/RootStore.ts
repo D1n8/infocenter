@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 import DiagramStore from '../DiagramStore';
 import DocumentsStore from '../DocumentsStore';
 import NotificationStore from '../NotificationStore';
+import UnitStore from '../UnitStore';
 import UserStore from '../UserStore';
 
 export class RootStore {
@@ -10,12 +11,14 @@ export class RootStore {
   diagramStore: DiagramStore;
   notificationStore: NotificationStore;
   documentsStore: DocumentsStore;
+  unitStore: UnitStore;
 
   constructor() {
     this.diagramStore = new DiagramStore();
     this.notificationStore = new NotificationStore();
     this.userStore = new UserStore(this.notificationStore);
     this.documentsStore = new DocumentsStore();
+    this.unitStore = new UnitStore();
   }
 }
 

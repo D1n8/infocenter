@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import Search from 'components/Icons/Search';
+import Input from 'components/Input';
+import { useState, useMemo } from 'react';
 import type { ActionType, BlockType, PermissionGrantType, UnitTreeItem } from 'types/index';
 
 import styles from './PermissionsTree.module.scss';
@@ -23,14 +25,27 @@ const ACTIONS: { value: ActionType; label: string }[] = [
   { value: 'manage', label: 'Управление' },
 ];
 
+function flattenTree(nodes: UnitTreeItem[]): UnitTreeItem[] {
+  let result: UnitTreeItem[] = [];
+  for (const node of nodes) {
+    result.push(node);
+    if (node.children && node.children.length > 0) {
+      result = result.concat(flattenTree(node.children));
+    }
+  }
+  return result;
+}
+
 function TreeNode({
   node,
   selectedPermissions,
   onChange,
+  isFlatMode = false,
 }: {
   node: UnitTreeItem;
   selectedPermissions: PermissionGrantType[];
   onChange: (permissions: PermissionGrantType[]) => void;
+  isFlatMode?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -58,9 +73,10 @@ function TreeNode({
     <div className={styles.treeNode}>
       <div className={styles.nodeHeader} onClick={() => setIsExpanded(!isExpanded)}>
         <span className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</span>
-        <span className={styles.nodeName}>
-          {node.name} {hasAnyPermissionInNode ? '(выбраны права)' : ''}
-        </span>
+        <div className={styles.nodeNameWrapper}>
+          <span className={styles.nodeName}>{node.name}</span>
+          {hasAnyPermissionInNode && <span className={styles.activeBadge}>(выбраны права)</span>}
+        </div>
       </div>
 
       {isExpanded && (
@@ -89,7 +105,7 @@ function TreeNode({
         </div>
       )}
 
-      {isExpanded && node.children && node.children.length > 0 && (
+      {isExpanded && !isFlatMode && node.children && node.children.length > 0 && (
         <div className={styles.childrenContainer}>
           {node.children.map((child) => (
             <TreeNode
@@ -97,6 +113,7 @@ function TreeNode({
               node={child}
               selectedPermissions={selectedPermissions}
               onChange={onChange}
+              isFlatMode={false}
             />
           ))}
         </div>
@@ -110,18 +127,55 @@ export default function PermissionsTree({
   selectedPermissions,
   onChange,
 }: PermissionsTreeProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const flatNodes = useMemo(() => flattenTree(tree), [tree]);
+
+  const filteredNodes = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    return flatNodes.filter((node) => node.name.toLowerCase().includes(query));
+  }, [flatNodes, searchQuery]);
+
   if (tree.length === 0) return <p>Загрузка структуры...</p>;
 
   return (
-    <div className={styles.treeContainer}>
-      {tree.map((node) => (
-        <TreeNode
-          key={node.id}
-          node={node}
-          selectedPermissions={selectedPermissions}
-          onChange={onChange}
-        />
-      ))}
+    <div className={styles.treeWrapper}>
+      <Input
+        icon={<Search />}
+        placeholder="Поиск по подразделениям..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className={styles.searchInput}
+      />
+
+      <div className={styles.treeContainer}>
+        {searchQuery.trim() ? (
+          filteredNodes.length > 0 ? (
+            filteredNodes.map((node) => (
+              <TreeNode
+                key={node.id}
+                node={node}
+                selectedPermissions={selectedPermissions}
+                onChange={onChange}
+                isFlatMode={true}
+              />
+            ))
+          ) : (
+            <p className={styles.emptySearch}>Подразделения не найдены</p>
+          )
+        ) : (
+          tree.map((node) => (
+            <TreeNode
+              key={node.id}
+              node={node}
+              selectedPermissions={selectedPermissions}
+              onChange={onChange}
+              isFlatMode={false}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }
