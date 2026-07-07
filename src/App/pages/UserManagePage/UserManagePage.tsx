@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import Button from 'components/Button';
+import Dropdown from 'components/Dropdown';
 import PageTitle from 'components/PageTitle/PageTitle';
 import PermissionsTree from 'components/PermissionsTree/PermissionsTree';
 import { routes } from 'config/routes';
@@ -22,6 +23,11 @@ function getFlatPermissions(apiPermissions: PermissionType[] | null): Permission
   }));
 }
 
+const ROLE_OPTIONS = [
+  { value: 'user', label: 'Пользователь' },
+  { value: 'admin', label: 'Администратор' },
+];
+
 const UserManagePage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const { userStore } = useRootStore();
@@ -32,6 +38,7 @@ const UserManagePage = observer(() => {
     email: '',
     fullName: '',
     jobTitle: '',
+    role: 'user',
   });
 
   const [selectedPermissions, setSelectedPermissions] = useState<PermissionGrantType[]>([]);
@@ -55,6 +62,7 @@ const UserManagePage = observer(() => {
         email: userStore.managedUser.email,
         fullName: userStore.managedUser.fullName,
         jobTitle: userStore.managedUser.jobTitle,
+        role: userStore.managedUser.role,
       });
     }
     if (userStore.managedPermissions) {
@@ -69,45 +77,55 @@ const UserManagePage = observer(() => {
 
     const originalPermissions = getFlatPermissions(userStore.managedPermissions);
 
-    const toGrant = selectedPermissions.filter(
-      (selected) =>
-        !originalPermissions.some(
-          (orig) =>
-            orig.unit_id === selected.unit_id &&
-            orig.block === selected.block &&
-            orig.action === selected.action
-        )
-    );
-
-    const toRevoke = originalPermissions.filter(
-      (orig) =>
-        !selectedPermissions.some(
-          (selected) =>
-            selected.unit_id === orig.unit_id &&
-            selected.block === orig.block &&
-            selected.action === orig.action
-        )
-    );
-
     const promises: Promise<unknown>[] = [
       userStore.updateUser(id, {
         login: formData.login,
         email: formData.email,
         full_name: formData.fullName,
         job_title: formData.jobTitle,
+        role: formData.role as 'user' | 'admin',
       }),
     ];
 
-    if (toGrant.length > 0) {
-      promises.push(userStore.grantPermissions(id, { permissions: toGrant }));
-    }
+    if (formData.role === 'admin') {
+      if (originalPermissions.length > 0) {
+        promises.push(userStore.revokePermissions(id, { permissions: originalPermissions }));
+      }
+      if (userStore.managedDocPermission) {
+        promises.push(userStore.setDocumentPermission(id, false));
+      }
+    } else {
+      const toGrant = selectedPermissions.filter(
+        (selected) =>
+          !originalPermissions.some(
+            (orig) =>
+              orig.unit_id === selected.unit_id &&
+              orig.block === selected.block &&
+              orig.action === selected.action
+          )
+      );
 
-    if (toRevoke.length > 0) {
-      promises.push(userStore.revokePermissions(id, { permissions: toRevoke }));
-    }
+      const toRevoke = originalPermissions.filter(
+        (orig) =>
+          !selectedPermissions.some(
+            (selected) =>
+              selected.unit_id === orig.unit_id &&
+              selected.block === orig.block &&
+              selected.action === orig.action
+          )
+      );
 
-    if (docPermission !== userStore.managedDocPermission) {
-      promises.push(userStore.setDocumentPermission(id, docPermission));
+      if (toGrant.length > 0) {
+        promises.push(userStore.grantPermissions(id, { permissions: toGrant }));
+      }
+
+      if (toRevoke.length > 0) {
+        promises.push(userStore.revokePermissions(id, { permissions: toRevoke }));
+      }
+
+      if (docPermission !== userStore.managedDocPermission) {
+        promises.push(userStore.setDocumentPermission(id, docPermission));
+      }
     }
 
     await Promise.all(promises);
@@ -117,6 +135,8 @@ const UserManagePage = observer(() => {
   if (userStore.isLoading && !userStore.managedUser) {
     return <div className={layoutStyles.settingsContainer}>Загрузка данных...</div>;
   }
+
+  const isAdmin = formData.role === 'admin';
 
   return (
     <>
@@ -150,43 +170,71 @@ const UserManagePage = observer(() => {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span style={{ fontSize: '14px', color: '#595959' }}>Роль в системе</span>
+              <Dropdown
+                id="role-select"
+                options={ROLE_OPTIONS}
+                value={formData.role}
+                onChange={(opt) => setFormData({ ...formData, role: String(opt.value) })}
+              />
+            </div>
           </div>
 
           <div className={styles.permissions}>
             <h3 className={styles.permissionsTitle}>Настройка прав доступа</h3>
-            <PermissionsTree
-              tree={userStore.unitsTree}
-              selectedPermissions={selectedPermissions}
-              onChange={setSelectedPermissions}
-            />
 
-            <div
-              style={{
-                marginBottom: '24px',
-                padding: '16px',
-                background: '#fafafa',
-                borderRadius: '8px',
-                border: '1px solid #f0f0f0',
-              }}
-            >
-              <label
+            {isAdmin ? (
+              <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 500,
+                  padding: '24px',
+                  background: '#f6ffed',
+                  border: '1px solid #91d5ff',
+                  borderRadius: '8px',
+                  color: '#096dd9',
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={docPermission}
-                  onChange={(e) => setDocPermission(e.target.checked)}
-                  style={{ width: '16px', height: '16px' }}
+                Администратор имеет полный доступ ко всем функциям и подразделениям системы.
+              </div>
+            ) : (
+              <>
+                <PermissionsTree
+                  tree={userStore.unitsTree}
+                  selectedPermissions={selectedPermissions}
+                  onChange={setSelectedPermissions}
                 />
-                Разрешить загрузку и удаление документов
-              </label>
-            </div>
+
+                <div
+                  style={{
+                    marginBottom: '24px',
+                    padding: '16px',
+                    background: '#fafafa',
+                    borderRadius: '8px',
+                    border: '1px solid #f0f0f0',
+                    marginTop: '16px',
+                  }}
+                >
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={docPermission}
+                      onChange={(e) => setDocPermission(e.target.checked)}
+                      style={{ width: '16px', height: '16px' }}
+                    />
+                    Разрешить загрузку и удаление документов
+                  </label>
+                </div>
+              </>
+            )}
           </div>
 
           <div className={layoutStyles.bottomContainer}>

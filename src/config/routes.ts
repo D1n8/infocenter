@@ -27,6 +27,10 @@ export const routes = {
     mask: 'user-create',
     create: () => '/settings/user-create',
   },
+  adminUnitsManage: {
+    mask: 'units-manage',
+    create: () => '/settings/units-manage',
+  },
   organizationaDocuments: {
     mask: 'organizational-documents',
     create: () => '/organizational-documents',

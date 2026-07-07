@@ -6,9 +6,22 @@
   background-color: #fafafa;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
-  max-height: 500px;
+
+  max-height: 340px;
   overflow-y: auto;
   box-sizing: border-box;
+
+  /* Кастомизация скроллбара (опционально, для красоты) */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #d9d9d9;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
 }
 
 .treeNode {
@@ -117,4 +130,34 @@
   border-left: 1px dashed #d9d9d9;
   margin-left: 16px;
   margin-top: 4px;
+}
+
+.treeWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 500px;
+}
+
+.emptySearch {
+  padding: 20px;
+  text-align: center;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.nodeNameWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activeBadge {
+  font-size: 12px;
+  color: #1890ff;
+  font-weight: 400;
 }

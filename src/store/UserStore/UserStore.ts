@@ -150,7 +150,6 @@ export default class UserStore {
     this._isLoading = true;
 
     try {
-      // ИСПОЛЬЗУЕМ ЧИСТЫЙ AXIOS ДЛЯ ЛОГИНА (чтобы избежать интерцепторов)
       const response = await api.post(`/auth/login`, {
         login: login,
         password: password,
@@ -159,7 +158,6 @@ export default class UserStore {
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
-      // После успешного логина запрашиваем профиль УЖЕ ЧЕРЕЗ API (с токенами)
       const userResponse = await api.get<UserTypeApi>('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
@@ -180,7 +178,7 @@ export default class UserStore {
       });
     } finally {
       runInAction(() => {
-        this._isLoading = false; // Теперь finally сработает на 100%
+        this._isLoading = false;
       });
     }
   }
@@ -389,7 +387,7 @@ export default class UserStore {
   async fetchUnitsTree() {
     this._isLoading = true;
     try {
-      const response = await api.get<UnitTreeItem[]>('/permissions/units/tree');
+      const response = await api.get<UnitTreeItem[]>('/units/tree');
       runInAction(() => {
         this._unitsTree = response.data;
       });
@@ -430,7 +428,7 @@ export default class UserStore {
     this._error = '';
 
     try {
-      await api.delete(`/permissions/users/${userId}`, { data: payload });
+      await api.delete(`/permissions/users/${userId}`, { data: payload.permissions });
       const response = await api.get<UserPermissionsType>(`/permissions/users/${userId}`);
 
       runInAction(() => {
