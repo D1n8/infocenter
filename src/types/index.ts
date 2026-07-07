@@ -112,6 +112,10 @@ export type UnitTreeItem = {
   children?: UnitTreeItem[];
 };
 
+export type UnitUpdateSchema = {
+  name: string;
+};
+
 export type NotificationType = {
   id: string;
   type: string;

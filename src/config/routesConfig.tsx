@@ -4,11 +4,12 @@ import BlockPage from 'App/pages/BlockPage';
 import ChartBuilderPage from 'App/pages/ChartBuilderPage';
 import ChartListSettings from 'App/pages/ChartListSettings';
 import ChartsComparisonPage from 'App/pages/ChartsComparisonPage';
-import DashboardMenu from 'App/pages/DashboardMenu/DashboardMenu'; // ИМПОРТ НОВОГО МЕНЮ
+import DashboardMenu from 'App/pages/DashboardMenu/DashboardMenu';
 import OrganizationalDocuments from 'App/pages/OrganizationalDocuments';
 import Profile from 'App/pages/Profile';
 import SettingsLayout from 'App/pages/SettingsPage/SettingsLayout';
 import SettingsPage from 'App/pages/SettingsPage/SettingsPage';
+import UnitsManagePage from 'App/pages/UnitsManagePage/UnitsManagePage';
 import UserCreatePage from 'App/pages/UserCreatePage';
 import UserManagePage from 'App/pages/UserManagePage';
 import UsersListPage from 'App/pages/UsersListPage';
@@ -25,7 +26,6 @@ export const routesConfig: RouteObject[] = [
         path: routes.main.mask,
         element: <App />,
         children: [
-          // Редирект с корня на дашборд
           {
             index: true,
             element: <Navigate to={routes.operationalManagement.create()} replace />,
@@ -39,16 +39,24 @@ export const routesConfig: RouteObject[] = [
                 element: <SettingsPage />,
               },
               {
-                path: routes.adminUsersList.mask,
-                element: <UsersListPage />,
-              },
-              {
-                path: routes.adminUserManage.mask,
-                element: <UserManagePage />,
-              },
-              {
-                path: routes.adminCreateUser.mask,
-                element: <UserCreatePage />,
+                children: [
+                  {
+                    path: routes.adminUsersList.mask,
+                    element: <UsersListPage />,
+                  },
+                  {
+                    path: routes.adminUserManage.mask,
+                    element: <UserManagePage />,
+                  },
+                  {
+                    path: routes.adminCreateUser.mask,
+                    element: <UserCreatePage />,
+                  },
+                  {
+                    path: routes.adminUnitsManage.mask,
+                    element: <UnitsManagePage />,
+                  },
+                ],
               },
             ],
           },
@@ -60,15 +68,10 @@ export const routesConfig: RouteObject[] = [
             path: routes.organizationaDocuments.mask,
             element: <OrganizationalDocuments />,
           },
-
-          // ==========================================
-          // ИЗМЕНЕНИЕ ЗДЕСЬ: Теперь по этому пути открывается меню из 5 плиток
           {
             path: routes.operationalManagement.mask,
             element: <DashboardMenu />,
           },
-          // ==========================================
-
           {
             path: routes.dashboardBlock.mask,
             element: <BlockPage />,

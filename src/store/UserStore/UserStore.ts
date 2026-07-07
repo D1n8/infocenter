@@ -148,16 +148,20 @@ export default class UserStore {
   async loginUser(login: string, password: string) {
     this._error = '';
     this._isLoading = true;
+
     try {
-      const response = await api.post('/auth/login', { login, password });
+      const response = await api.post(`/auth/login`, {
+        login: login,
+        password: password,
+      });
+
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
 
-      const userResponse = await api.get('/users/me');
+      const userResponse = await api.get<UserTypeApi>('/users/me');
       const permsResponse = await api.get<UserPermissionsType>(
         `/permissions/users/${userResponse.data.id}`
       );
-
       const docPermsResponse =
         await api.get<DocumentPermissionResponseSchema>('/permissions/documents');
 
@@ -170,7 +174,7 @@ export default class UserStore {
       this.notificationStore.connect();
     } catch {
       runInAction(() => {
-        this._error = 'Не удалось авторизоваться';
+        this._error = 'Не удалось авторизоваться. Проверьте логин и пароль.';
       });
     } finally {
       runInAction(() => {
@@ -383,7 +387,7 @@ export default class UserStore {
   async fetchUnitsTree() {
     this._isLoading = true;
     try {
-      const response = await api.get<UnitTreeItem[]>('/permissions/units/tree');
+      const response = await api.get<UnitTreeItem[]>('/units/tree');
       runInAction(() => {
         this._unitsTree = response.data;
       });
@@ -424,7 +428,7 @@ export default class UserStore {
     this._error = '';
 
     try {
-      await api.delete(`/permissions/users/${userId}`, { data: payload });
+      await api.delete(`/permissions/users/${userId}`, { data: payload.permissions });
       const response = await api.get<UserPermissionsType>(`/permissions/users/${userId}`);
 
       runInAction(() => {

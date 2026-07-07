@@ -66,7 +66,14 @@
   }
 }
 
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .downloadLink {
+  max-width: 600px;
   background: none;
   border: none;
   padding: 0;
