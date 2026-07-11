@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: .
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: infocenter_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
